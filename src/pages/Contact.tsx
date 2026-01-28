@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react"; 
+import { getContactDetails, type ContactDetailsResponse } from "../api/contactDetails";
 
-type Office = {
+type OfficeUI = {
   title: string;
   lines: string[];
   mapQuery?: string;
@@ -8,59 +9,63 @@ type Office = {
 };
 
 export default function Contact() {
-  const phones = useMemo(
-    () => ["+971 586595733", "+94 112 825147", "+94 775286377"],
-    []
-  );
+  const [data, setData] = useState<ContactDetailsResponse["data"] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const emails = useMemo(
-    () => [
-      "jeewaka@glsalliance.com",
-      "glsalliance@outlook.com",
-      "mkt@glsalliance.com",
-      "doc@glsalliance.com",
-      "ops@glsalliance.com",
-    ],
-    []
-  );
+  useEffect(() => {
+    let mounted = true;
 
-  const dubaiOffice: Office = {
-    title: "Dubai (UAE) — Head Office",
-    lines: [
-      "GLS Alliance FZ LLC.,",
-      "Al Jabri Building, 321, Street 2D,",
-      "Naif, Deira,",
-      "United Arab Emirates",
-    ],
-    mapQuery: "Al Jabri Building, 321, Street 2D, Naif, Deira, Dubai, United Arab Emirates",
-    mapTitle: "Dubai Head Office Map",
-  };
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const sriLankaOffice: Office = {
-    title: "Sri Lanka — Kohuwala Office",
-    lines: [
-      "GLS Alliance Pvt Ltd",
-      "30/1A, Wijayamangalarama Road,",
-      "Kohuwala, Sri Lanka.",
-      "Tel: +94 112 825147",
-      "Hot Line: +94 775286377",
-      "Mail: jeewaka@glsalliance.com",
-      "      glsalliance@outlook.com",
-    ],
-    mapQuery: "30/1A, Wijayamangalarama Road, Kohuwala, Sri Lanka",
-    mapTitle: "Sri Lanka Office Map",
-  };
+        const res = await getContactDetails();
+        if (mounted) setData(res.data);
+      } catch (e: any) {
+        if (mounted) setError(e?.message || "Failed to load contact details");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
 
-  const rakOffice: Office = {
-    title: "Registered Office — RAK (UAE)",
-    lines: [
-      "Ras Al Khaimah Economic Zone (RAKEZ) Compass Building,",
-      "Al Shohada Road,",
-      "Al Hamra Industrial Zone - FZ,",
-      "Ras Al Khaimah, United Arab Emirates,",
-      "P.O.Box - 414858",
-    ],
-  };
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const phones = useMemo(() => data?.global_contact?.phones ?? [], [data]);
+  const emails = useMemo(() => data?.global_contact?.emails ?? [], [data]);
+
+  const offices: OfficeUI[] = useMemo(() => {
+    const list = data?.offices ?? [];
+    return list.map((o) => {
+      const title = `${o.office_name}${o.company_name ? ` — ${o.company_name}` : ""}`;
+
+      const lines: string[] = [
+        ...(o.address_lines ?? []),
+        ...(o.phones?.length ? ["", "Phone:", ...o.phones] : []),
+        ...(o.emails?.length ? ["", "Email:", ...o.emails] : []),
+      ].filter((x) => x !== "");
+
+      const mapQuery = [...(o.address_lines ?? [])].join(", ");
+      return {
+        title,
+        lines,
+        mapQuery: mapQuery || undefined,
+        mapTitle: `${o.office_name} Map`,
+      };
+    });
+  }, [data]);
+
+  const registeredOffice: OfficeUI | null = useMemo(() => {
+    if (!data?.registered_office) return null;
+    return {
+      title: data.registered_office.title || "Registered Office",
+      lines: data.registered_office.address ?? [],
+    };
+  }, [data]);
 
   return (
     <main className="bg-primary pt-24 text-[var(--color-muted)]">
@@ -69,102 +74,164 @@ export default function Contact() {
         <div className="container py-14">
           <h1 className="text-[var(--color-black)]">Contact GLS Alliance</h1>
           <p className="mt-3">
-            Reach our team via phone or email. Offices in Dubai (UAE) and Kohuwala (Sri Lanka).
+            Reach our team via phone or email. Offices and contact points listed below.
           </p>
+
+          {/* Optional: Who we are / Vision / Mission */}
+          {!loading && !error && data && (
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <InfoBlock title={data.who_we_are?.title} desc={data.who_we_are?.description} />
+              <InfoBlock title={data.vision?.title} desc={data.vision?.description} />
+              <InfoBlock title={data.mission?.title} desc={data.mission?.description} />
+            </div>
+          )}
         </div>
       </section>
 
       {/* Content */}
       <section>
-        <div className="container py-12 grid gap-8 lg:grid-cols-3">
-          {/* Left: Offices */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Side-by-side offices */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <OfficeCard office={dubaiOffice} />
-              <OfficeCard office={sriLankaOffice} />
+        <div className="container py-12">
+          {loading && (
+            <div className="text-center text-[var(--color-muted)]/80">
+              Loading contact details...
             </div>
+          )}
 
-            {/* Side-by-side maps */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <OfficeMap
-                query={dubaiOffice.mapQuery!}
-                title={dubaiOffice.mapTitle!}
-              />
-              <OfficeMap
-                query={sriLankaOffice.mapQuery!}
-                title={sriLankaOffice.mapTitle!}
-              />
-            </div>
+          {!loading && error && (
+            <div className="text-center text-red-600">{error}</div>
+          )}
 
-            {/* Registered office full width */}
-            <OfficeCard office={rakOffice} />
-          </div>
+          {!loading && !error && data && (
+            <div className="grid gap-8 lg:grid-cols-3">
+              {/* Left: Offices */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Offices (cards) */}
+                {offices.length > 0 && (
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    {offices.slice(0, 2).map((office) => (
+                      <OfficeCard key={office.title} office={office} />
+                    ))}
+                  </div>
+                )}
 
-          {/* Right: Contact methods */}
-          <aside className="space-y-6">
-            <Card>
-              <h3 className="text-[var(--color-black)] font-medium mb-4">Phone</h3>
-              <ul className="space-y-2">
-                {phones.map((p) => (
-                  <li key={p}>
-                    <a
-                      href={`tel:${p.replace(/\s+/g, "")}`}
-                      className="text-[var(--color-accent)] hover:underline"
-                    >
-                      {p}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+                {/* Maps for first 2 offices */}
+                {offices.length > 0 && (
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    {offices.slice(0, 2).map((office) =>
+                      office.mapQuery ? (
+                        <OfficeMap
+                          key={`${office.title}-map`}
+                          query={office.mapQuery}
+                          title={office.mapTitle || "Office Map"}
+                        />
+                      ) : (
+                        <Card key={`${office.title}-map`}>
+                          <div className="text-[var(--color-muted)]/80">
+                            No map address for {office.title}
+                          </div>
+                        </Card>
+                      )
+                    )}
+                  </div>
+                )}
 
-            <Card>
-              <h3 className="text-[var(--color-black)] font-medium mb-4">Email</h3>
-              <ul className="space-y-2">
-                {emails.map((e) => (
-                  <li key={e}>
-                    <a
-                      href={`mailto:${e}`}
-                      className="text-[var(--color-accent)] hover:underline break-all"
-                    >
-                      {e}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+                {/* If there are more offices, list them full-width */}
+                {offices.length > 2 && (
+                  <div className="space-y-6">
+                    {offices.slice(2).map((office) => (
+                      <OfficeCard key={office.title} office={office} />
+                    ))}
+                  </div>
+                )}
 
-            <Card>
-              <h3 className="text-[var(--color-black)] font-medium mb-4">Quick Actions</h3>
-              <div className="flex flex-col gap-3">
-                <a
-                  className="btn-accent text-center"
-                  href="mailto:ops@glsalliance.com?subject=Inquiry%20from%20GLS%20Alliance%20Website"
-                >
-                  Email Operations
-                </a>
-
-                <a
-                  className="btn-accent text-center"
-                  href="https://maps.google.com/?q=Al+Jabri+Building+Naif+Deira+Dubai"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Get Directions (Dubai)
-                </a>
-
-                <a
-                  className="btn-accent text-center"
-                  href="https://maps.google.com/?q=Wijayamangalarama+Road+Kohuwala+Sri+Lanka"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Get Directions (Sri Lanka)
-                </a>
+                {/* Registered office full width */}
+                {registeredOffice && <OfficeCard office={registeredOffice} />}
               </div>
-            </Card>
-          </aside>
+
+              {/* Right: Contact methods */}
+              <aside className="space-y-6">
+                <Card>
+                  <h3 className="text-[var(--color-black)] font-medium mb-4">Phone</h3>
+                  {phones.length === 0 ? (
+                    <div className="text-[var(--color-muted)]/70">No phone numbers</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {phones.map((p) => (
+                        <li key={p}>
+                          <a
+                            href={`tel:${p.replace(/\s+/g, "")}`}
+                            className="text-[var(--color-accent)] hover:underline"
+                          >
+                            {p}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Card>
+
+                <Card>
+                  <h3 className="text-[var(--color-black)] font-medium mb-4">Email</h3>
+                  {emails.length === 0 ? (
+                    <div className="text-[var(--color-muted)]/70">No email addresses</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {emails.map((e) => (
+                        <li key={e}>
+                          <a
+                            href={`mailto:${e}`}
+                            className="text-[var(--color-accent)] hover:underline break-all"
+                          >
+                            {e}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Card>
+
+                <Card>
+                  <h3 className="text-[var(--color-black)] font-medium mb-4">Quick Actions</h3>
+                  <div className="flex flex-col gap-3">
+                    {emails?.[0] ? (
+                      <a
+                        className="btn-accent text-center"
+                        href={`mailto:${emails[0]}?subject=Inquiry%20from%20GLS%20Alliance%20Website`}
+                      >
+                        Email Us
+                      </a>
+                    ) : (
+                      <div className="text-[var(--color-muted)]/70">
+                        No email configured for quick action
+                      </div>
+                    )}
+
+                    {offices?.[0]?.mapQuery && (
+                      <a
+                        className="btn-accent text-center"
+                        href={`https://maps.google.com/?q=${encodeURIComponent(offices[0].mapQuery)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Get Directions (Office 1)
+                      </a>
+                    )}
+
+                    {offices?.[1]?.mapQuery && (
+                      <a
+                        className="btn-accent text-center"
+                        href={`https://maps.google.com/?q=${encodeURIComponent(offices[1].mapQuery)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Get Directions (Office 2)
+                      </a>
+                    )}
+                  </div>
+                </Card>
+              </aside>
+            </div>
+          )}
         </div>
       </section>
     </main>
@@ -174,14 +241,10 @@ export default function Contact() {
 /* ---------- small internal components ---------- */
 
 function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-white p-6">
-      {children}
-    </div>
-  );
+  return <div className="rounded-2xl border border-black/10 bg-white p-6">{children}</div>;
 }
 
-function OfficeCard({ office }: { office: Office }) {
+function OfficeCard({ office }: { office: { title: string; lines: string[] } }) {
   return (
     <Card>
       <h3 className="text-[var(--color-black)] font-medium">{office.title}</h3>
@@ -194,7 +257,6 @@ function OfficeCard({ office }: { office: Office }) {
   );
 }
 
-/** Google Maps iframe without API key. Uses a search query -> output=embed. */
 function OfficeMap({ query, title }: { query: string; title: string }) {
   const src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
   return (
@@ -210,5 +272,15 @@ function OfficeMap({ query, title }: { query: string; title: string }) {
         />
       </div>
     </Card>
+  );
+}
+
+function InfoBlock({ title, desc }: { title?: string; desc?: string }) {
+  if (!title && !desc) return null;
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-5">
+      <div className="font-semibold text-[var(--color-black)]">{title}</div>
+      <div className="mt-2 text-[var(--color-muted)]/80">{desc}</div>
+    </div>
   );
 }
