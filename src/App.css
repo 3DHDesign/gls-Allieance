@@ -1,0 +1,183 @@
+/* app.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+@import "flag-icons/css/flag-icons.min.css";
+
+/* ==============================
+   THEME (3 colors + fonts)
+   ============================== */
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+
+  --color-primary: #ffffff;   /* White */
+  --color-muted:   #555555;   /* Grey */
+  
+  /* Updated Accent */
+  --color-accent: #011E4F;       /* Dark Navy Blue */
+  --color-accent-light: #5A8AB2; /* Light Blue */
+  --color-accent-mid: #03346C;   /* Medium Navy */
+  --color-black: #000000;        /* Black */
+}
+
+/* ==============================
+   BASE TYPOGRAPHY
+   ============================== */
+@layer base {
+  html, body {
+    @apply font-sans bg-primary text-muted;
+  }
+
+  /* NAV default color = white from theme */
+  nav, nav a, .nav-link {
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--color-primary);
+    transition: color 0.2s;
+  }
+  nav a:hover, .nav-link:hover {
+    color: var(--color-accent);
+  }
+
+  /* HERO headings */
+  h1 {
+    font-size: 42px;
+    line-height: 50px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .hero-sub, h2 {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 500;
+    color: var(--color-primary);
+  }
+
+  h3 {
+    font-size: 24px;
+    line-height: 34px;
+    font-weight: 300;
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 300;
+  }
+}
+
+/* ==============================
+   CONTAINERS
+   ============================== */
+@layer utilities {
+  /* Bootstrap-style container */
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 576px)  { .container { max-width: 540px; } }
+  @media (min-width: 768px)  { .container { max-width: 720px; } }
+  @media (min-width: 992px)  { .container { max-width: 960px; } }
+  @media (min-width: 1200px) { .container { max-width: 1140px; } }
+  @media (min-width: 1400px) { .container { max-width: 1320px; } }
+
+  /* Wide container for main layouts */
+  .container-wide {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 1200px) { .container-wide { max-width: 1440px; } }
+  @media (min-width: 1600px) { .container-wide { max-width: 1600px; } }
+
+  /* Extra-wide for big screens */
+  .container-xxl {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 1536px) { .container-xxl { max-width: 1728px; } }
+  @media (min-width: 1728px) { .container-xxl { max-width: 1800px; } }
+  @media (min-width: 1920px) { .container-xxl { max-width: 1920px; } }
+}
+
+/* ==============================
+   UTILITIES
+   ============================== */
+.btn-accent {
+  @apply bg-accent text-primary font-medium px-6 py-3 rounded-lg;
+}
+
+.text-on-dark {
+  color: var(--color-primary);
+}
+
+.text-muted {
+  color: var(--color-muted);
+}
+
+/* ===== Freight slider look ===== */
+.ff-slider { padding-block: 8px; }
+.ff-slider .swiper-slide { width: 340px; transition: transform .35s ease, opacity .35s ease; }
+@media (min-width: 768px) { .ff-slider .swiper-slide { width: 380px; } }
+
+/* dim all slides by default */
+.ff-slider .swiper-slide { opacity: .35; transform: scale(.92); }
+/* brighten & enlarge the active one */
+.ff-slider .swiper-slide-active { opacity: 1; transform: scale(1.06); }
+/* slightly brighter for neighbors */
+.ff-slider .swiper-slide-next,
+.ff-slider .swiper-slide-prev { opacity: .6; transform: scale(.97); }
+
+/* card highlight */
+.ff-card {
+  background: var(--color-primary);
+  border: 1px solid rgb(0 0 0 / .05);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,.06);
+  transition: box-shadow .35s ease, border-color .35s ease;
+}
+.ff-slider .swiper-slide-active .ff-card {
+  border-color: var(--color-accent);
+  box-shadow: 0 18px 48px rgba(0,0,0,.18);
+}
+
+/* nav buttons */
+.ff-nav {
+  position: absolute; inset-block: 0; display: flex; align-items: center;
+  width: 56px; justify-content: center; z-index: 10;
+}
+.ff-prev { left: -6px; } .ff-next { right: -6px; }
+.ff-btn {
+  width: 42px; height: 42px; border-radius: 9999px; display: grid; place-items: center;
+  background: rgba(0,0,0,.55); color: #fff; font-size: 20px; line-height: 1;
+}
+.ff-btn:hover { background: rgba(0,0,0,.7); }
+/* testimonial slider sizing & highlight */
+.ts-slider .swiper-slide { width: 520px; transition: transform .35s ease, opacity .35s ease; }
+@media (max-width: 768px) { .ts-slider .swiper-slide { width: 86vw; } }
+
+.ts-slider .swiper-slide { opacity: .4; transform: scale(.94); }
+.ts-slider .swiper-slide-active { opacity: 1; transform: scale(1.03); }
+.ts-slider .swiper-slide-next,
+.ts-slider .swiper-slide-prev { opacity: .7; transform: scale(.98); }
+
+.ts-card { transition: box-shadow .35s ease, border-color .35s ease; }
+.ts-slider .swiper-slide-active .ts-card {
+  border-color: var(--color-accent);
+  box-shadow: 0 18px 48px rgba(0,0,0,.18);
+}
+
+/* nav buttons */
+.ts-btn {
+  width: 42px; height: 42px; border-radius: 9999px;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.55); color: #fff; font-size: 20px; line-height: 1;
+  z-index: 10; transition: background .2s ease;
+}
+.ts-btn:hover { background: rgba(0,0,0,.7); }
