@@ -1,4 +1,3 @@
-import { EVENT_MONTHS } from "../../utils/events";
 import { useMemo } from "react";
 import { FiGlobe, FiCalendar, FiSearch, FiRefreshCcw } from "react-icons/fi";
 
@@ -7,22 +6,26 @@ type Props = {
   month: string; setMonth: (v: string) => void;   // "YYYY-MM"
   keyword: string; setKeyword: (v: string) => void;
   onReset: () => void;
-};
 
-const COUNTRIES = ["Sri Lanka", "China"] as const;
+  countries: string[];
+  months: string[]; // ["YYYY-MM"]
+};
 
 export default function EventsFilter(p: Props) {
   const prettyMonths = useMemo(
     () =>
-      EVENT_MONTHS.map((m) => {
+      p.months.map((m) => {
         const [y, mm] = m.split("-");
         const date = new Date(Number(y), Number(mm) - 1, 1);
         return {
           value: m,
-          label: date.toLocaleDateString(undefined, { month: "long", year: "numeric" }),
+          label: date.toLocaleDateString(undefined, {
+            month: "long",
+            year: "numeric",
+          }),
         };
       }),
-    []
+    [p.months]
   );
 
   return (
@@ -32,7 +35,6 @@ export default function EventsFilter(p: Props) {
           Events
         </h2>
 
-        {/* One-row pill bar (wraps on small screens) */}
         <div className="flex flex-col lg:flex-row lg:items-center gap-3">
           {/* Country */}
           <div className="relative flex-1 min-w-[220px]">
@@ -43,10 +45,16 @@ export default function EventsFilter(p: Props) {
               className="w-full appearance-none rounded-full border border-gray-200 bg-white pl-11 pr-10 py-3
                          focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             >
-              <option value="" disabled hidden>Select country</option>
-              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              <option value="">All countries</option>
+              {p.countries.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40">▾</span>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40">
+              ▾
+            </span>
           </div>
 
           {/* Month */}
@@ -58,10 +66,16 @@ export default function EventsFilter(p: Props) {
               className="w-full appearance-none rounded-full border border-gray-200 bg-white pl-11 pr-10 py-3
                          focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             >
-              <option value="" disabled hidden>Select month</option>
-              {prettyMonths.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+              <option value="">All months</option>
+              {prettyMonths.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
             </select>
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40">▾</span>
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 opacity-40">
+              ▾
+            </span>
           </div>
 
           {/* Keyword */}
@@ -80,8 +94,7 @@ export default function EventsFilter(p: Props) {
           <div className="flex-none">
             <button
               onClick={p.onReset}
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-5 py-3
-                         hover:bg-gray-50"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-5 py-3 hover:bg-gray-50"
             >
               <FiRefreshCcw /> Reset
             </button>

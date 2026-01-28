@@ -11,6 +11,7 @@ import About from "./pages/About";
 import ForwarderProfile from "./pages/ForwarderProfile";
 import Resources from "./pages/Resources";
 import Benefits from "./pages/Benefits";
+import EventDetail from "./pages/EventDetail";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         {/* optional: fallback */}
         <Route path="*" element={<Home />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/events/:slug" element={<EventDetail />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/benefits" element={<Benefits />} />
         <Route path="/member-registration" element={<MemberRegistration />} />
