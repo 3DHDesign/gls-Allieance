@@ -78,13 +78,13 @@ export default function Contact() {
           </p>
 
           {/* Optional: Who we are / Vision / Mission */}
-          {!loading && !error && data && (
+          {/* {!loading && !error && data && (
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               <InfoBlock title={data.who_we_are?.title} desc={data.who_we_are?.description} />
               <InfoBlock title={data.vision?.title} desc={data.vision?.description} />
               <InfoBlock title={data.mission?.title} desc={data.mission?.description} />
             </div>
-          )}
+          )} */}
         </div>
       </section>
 

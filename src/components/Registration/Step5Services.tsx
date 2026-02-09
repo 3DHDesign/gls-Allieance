@@ -1,5 +1,5 @@
 // src/components/Registration/Step5Services.tsx
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Country } from "country-state-city";
 import type { RegistrationForm } from "../../types/registration";
 
@@ -44,7 +44,7 @@ export default function Step5Services({
 }) {
   const s = form.services;
 
-  // Countries (multi-select)
+  // Countries (for branches)
   const countries = useMemo(
     () =>
       Country.getAllCountries()
@@ -53,11 +53,35 @@ export default function Step5Services({
     []
   );
 
+  const [countryQuery, setCountryQuery] = useState("");
+
   const toggle = (list: string[], value: string) =>
     list.includes(value) ? list.filter((x) => x !== value) : [...list, value];
 
   const setServices = (patch: Partial<RegistrationForm["services"]>) =>
     setForm({ ...form, services: { ...s, ...patch } });
+
+  const filteredCountries = useMemo(() => {
+    const q = countryQuery.trim().toLowerCase();
+    if (!q) return countries;
+    return countries.filter((c) => c.name.toLowerCase().includes(q));
+  }, [countries, countryQuery]);
+
+  const selectedCountryNames = useMemo(() => {
+    const map = new Map(countries.map((c) => [c.isoCode, c.name]));
+    return (s.supportedCountries || []).map((code) => ({
+      code,
+      name: map.get(code) || code,
+    }));
+  }, [countries, s.supportedCountries]);
+
+  const branchesLabel =
+    form.profileType === "importer_exporter" ? "Operating Countries" : "Branches";
+
+  const branchesHelp =
+    form.profileType === "importer_exporter"
+      ? "Select countries where you operate or trade."
+      : "Select countries where you have offices/branches or active operations.";
 
   return (
     <section className="container mt-6">
@@ -96,42 +120,92 @@ export default function Step5Services({
             </div>
           </div>
 
-          {/* Branches (multi-country) */}
+          {/* Branches / Operating Countries (Search + checkbox list) */}
           <div>
-            <label className="block text-sm mb-2">Branches</label>
-            <select
-              multiple
-              value={s.supportedCountries}
-              onChange={(e) => {
-                const vals = Array.from(e.target.selectedOptions).map(
-                  (o) => o.value
-                );
-                setServices({ supportedCountries: vals });
-              }}
-              className="w-full rounded-lg border border-gray-200 px-3 py-3 h-48"
-            >
-              {countries.map((c) => (
-                <option key={c.isoCode} value={c.isoCode}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-[var(--color-muted)] mt-1">
-              Hold Ctrl/Cmd to select multiple.
-            </p>
+            <label className="block text-sm mb-2">{branchesLabel}</label>
+
+            {/* Selected chips */}
+            {s.supportedCountries.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {selectedCountryNames.map(({ code, name }) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() =>
+                      setServices({
+                        supportedCountries: s.supportedCountries.filter(
+                          (x) => x !== code
+                        ),
+                      })
+                    }
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 text-sm hover:border-[var(--color-accent)]/60"
+                    title="Remove"
+                  >
+                    <span>{name}</span>
+                    <span className="text-[var(--color-muted)]/70">✕</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Search */}
+            <input
+              value={countryQuery}
+              onChange={(e) => setCountryQuery(e.target.value)}
+              placeholder="Search countries (e.g., Sri Lanka, UAE, India)…"
+              className="w-full rounded-lg border border-gray-200 px-3 py-3"
+            />
+
+            {/* Checkbox list */}
+            <div className="mt-3 h-56 overflow-auto rounded-lg border border-gray-200 bg-white p-2">
+              {filteredCountries.length === 0 ? (
+                <div className="p-3 text-sm text-[var(--color-muted)]">
+                  No countries found.
+                </div>
+              ) : (
+                <ul className="space-y-1">
+                  {filteredCountries.map((c) => {
+                    const active = s.supportedCountries.includes(c.isoCode);
+                    return (
+                      <li key={c.isoCode}>
+                        <label
+                          className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 ${
+                            active ? "bg-[var(--color-accent)]/5" : ""
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={active}
+                            onChange={() =>
+                              setServices({
+                                supportedCountries: toggle(
+                                  s.supportedCountries,
+                                  c.isoCode
+                                ),
+                              })
+                            }
+                          />
+                          <span className="flex-1">{c.name}</span>
+                          <span className="text-xs text-[var(--color-muted)]/70">
+                            {c.isoCode}
+                          </span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            <p className="text-xs text-[var(--color-muted)] mt-2">{branchesHelp}</p>
           </div>
 
           {/* Service Sectors (free text) */}
           <div>
             <label className="block text-sm mb-1">Service Sectors</label>
             <input
-              value={(s as any).serviceSectors || ""}
-              onChange={(e) =>
-                setServices({
-                  ...(s as any),
-                  serviceSectors: e.target.value,
-                })
-              }
+              value={s.serviceSectors || ""}
+              onChange={(e) => setServices({ serviceSectors: e.target.value })}
               className="w-full rounded-lg border border-gray-200 px-3 py-3"
               placeholder="e.g., Automotive, FMCG, Pharma, Textile, Oil & Gas…"
             />

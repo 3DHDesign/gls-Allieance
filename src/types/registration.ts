@@ -24,12 +24,13 @@ export type CompanyInfo = {
   website?: string;
   profileBrief?: string;
 
-  // OLD:
-  // productCategories?: string[];
+  // ✅ ADD THESE (cover photo for importer/exporter only)
+  coverPhoto?: File | null;
+  coverPhotoPreview?: string;
 
   // NEW: only one main category
-  productCategoryId?: string;        // e.g. "electrical-electronic-products"
-  productSubcategories?: string[];   // one or many subs
+  productCategoryId?: string;
+  productSubcategories?: string[];
 
   financialProtectionRequired?: boolean | null;
   nettingRequired?: boolean | null;
