@@ -275,12 +275,4 @@ function OfficeMap({ query, title }: { query: string; title: string }) {
   );
 }
 
-function InfoBlock({ title, desc }: { title?: string; desc?: string }) {
-  if (!title && !desc) return null;
-  return (
-    <div className="rounded-2xl border border-black/10 bg-white p-5">
-      <div className="font-semibold text-[var(--color-black)]">{title}</div>
-      <div className="mt-2 text-[var(--color-muted)]/80">{desc}</div>
-    </div>
-  );
-}
+ 
