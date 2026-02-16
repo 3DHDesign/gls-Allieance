@@ -1,4 +1,6 @@
+import React from "react";
 import type { RegistrationForm } from "../../types/registration";
+import { productCategories } from "../../utils/exportCategories";
 
 export default function Step7Review({
   form,
@@ -44,6 +46,12 @@ export default function Step7Review({
 
   const isImporterExporter = form.profileType === "importer_exporter";
 
+  const categoryLabel =
+    productCategories.find((c) => c.id === form.company.productCategoryId)
+      ?.label ||
+    form.company.productCategoryId ||
+    "—";
+
   return (
     <section className="container mt-6">
       <div className="rounded-2xl bg-white border border-gray-400 shadow p-5 md:p-6">
@@ -67,21 +75,62 @@ export default function Step7Review({
           <Section title="Company Information" step={1}>
             <Row label="Company Name" value={form.company.companyName} />
             <Row label="Trade Name" value={form.company.tradeName} />
-            <Row label="Registered Address" value={form.company.registeredAddress} />
+            <Row
+              label="Registered Address"
+              value={form.company.registeredAddress}
+            />
+            <Row label="Reg Country" value={form.company.regCountryCode} />
             <Row label="Reg State" value={form.company.regState} />
             <Row label="Reg City" value={form.company.regCity} />
             <Row label="Reg ZIP" value={form.company.regZip} />
-            <Row label="Mailing Title" value={form.company.mailing.title} />
-            <Row label="Mailing Country" value={form.company.mailing.countryCode} />
-            <Row label="Mailing State" value={form.company.mailing.stateCode} />
-            <Row label="Mailing City" value={form.company.mailing.city} />
-            <Row label="Mailing ZIP" value={form.company.mailing.zip} />
-            <Row label="Year Established" value={form.company.yearEstablished} />
+            <Row
+              label="Year Established"
+              value={form.company.yearEstablished}
+            />
             <Row label="Website" value={form.company.website} />
+
+            {isImporterExporter && (
+              <>
+                <div className="mt-3 border-t border-gray-200 pt-3" />
+                <Row label="Main Product Category" value={categoryLabel} />
+                <Row
+                  label="Sub Categories"
+                  value={
+                    form.company.productSubcategories?.length
+                      ? form.company.productSubcategories.join(", ")
+                      : "—"
+                  }
+                />
+              </>
+            )}
+
+            <div className="mt-3 border-t border-gray-200 pt-3" />
+            <Row
+              label="Financial Protection Required"
+              value={
+                form.company.financialProtectionRequired === null ||
+                form.company.financialProtectionRequired === undefined
+                  ? "—"
+                  : form.company.financialProtectionRequired
+                  ? "Yes"
+                  : "No"
+              }
+            />
+            <Row
+              label="Netting Required"
+              value={
+                form.company.nettingRequired === null ||
+                form.company.nettingRequired === undefined
+                  ? "—"
+                  : form.company.nettingRequired
+                  ? "Yes"
+                  : "No"
+              }
+            />
           </Section>
 
           {/* Contacts */}
-          <Section title="Contact Information" step={2}>
+          <Section title="Contact Information" step={1}>
             {form.contacts?.length ? (
               form.contacts.map((c, i) => (
                 <div key={i} className={i === 0 ? "" : "mt-4"}>
@@ -99,7 +148,7 @@ export default function Step7Review({
           </Section>
 
           {/* Business Registration */}
-          <Section title="Business Registration" step={3}>
+          <Section title="Business Registration" step={2}>
             <Row label="BRC Number" value={form.business.brcNumber} />
             <Row label="Issue Date" value={form.business.issueDate} />
             <Row label="Expiry Date" value={form.business.expiryDate} />
@@ -107,11 +156,14 @@ export default function Step7Review({
           </Section>
 
           {/* Company Profile */}
-          <Section title="Company Profile" step={4}>
+          <Section title="Company Profile" step={3}>
             <Row label="Profile Brief" value={form.company.profileBrief} />
             {isImporterExporter && (
               <>
-                <Row label="Cover Photo" value={form.company.coverPhoto?.name} />
+                <Row
+                  label="Cover Photo"
+                  value={form.company.coverPhoto?.name}
+                />
                 {form.company.coverPhotoPreview ? (
                   <div className="mt-3 rounded-2xl overflow-hidden border border-gray-200">
                     <img
@@ -126,7 +178,8 @@ export default function Step7Review({
           </Section>
 
           {/* Services & Activities */}
-          <Section title="Services & Activities" step={5}>
+          {/* Services & Activities */}
+          <Section title="Services & Activities" step={4}>
             <Row
               label="Services"
               value={
@@ -135,29 +188,37 @@ export default function Step7Review({
                   : "—"
               }
             />
-            {!!form.services.coreActivities?.length && (
-              <Row
-                label="Core Activities"
-                value={form.services.coreActivities.join(", ")}
-              />
-            )}
+
             <Row
-              label={form.profileType === "importer_exporter" ? "Operating Countries" : "Branches"}
+              label="Core Activities"
+              value={
+                form.services.coreActivities?.length
+                  ? form.services.coreActivities.join(", ")
+                  : "—"
+              }
+            />
+
+            <Row
+              label={isImporterExporter ? "Operating Countries" : "Branches"}
               value={
                 form.services.supportedCountries?.length
                   ? form.services.supportedCountries.join(", ")
                   : "—"
               }
             />
+
             <Row label="Service Sectors" value={form.services.serviceSectors} />
           </Section>
 
           {/* Insurance */}
-          <Section title="Insurance Information" step={6}>
+          <Section title="Insurance Information" step={5}>
             <Row label="Provider" value={form.insurance.provider} />
             <Row label="Policy Type" value={form.insurance.policyType} />
             <Row label="Policy Number" value={form.insurance.policyNumber} />
-            <Row label="Coverage Amount" value={form.insurance.coverageAmount} />
+            <Row
+              label="Coverage Amount"
+              value={form.insurance.coverageAmount}
+            />
             <Row label="Expiry Date" value={form.insurance.expiryDate} />
             <Row label="Policy Doc" value={form.insurance.policyDoc?.name} />
           </Section>

@@ -31,6 +31,22 @@ const SERVICE_OPTIONS = [
   "Trading",
 ];
 
+// Core Activities list (you can edit later)
+const CORE_ACTIVITY_OPTIONS = [
+  "Freight Forwarding",
+  "Customs Clearance",
+  "Warehousing & Distribution",
+  "Transport & Haulage",
+  "E-commerce Logistics",
+  "Project Cargo",
+  "Cold Chain Logistics",
+  "Consolidation / Groupage",
+  "NVOCC Operations",
+  "Cross Border / Cross Trade",
+  "Ship Agency / Airline GSA",
+  "Trading / Sourcing",
+];
+
 export default function Step5Services({
   form,
   setForm,
@@ -38,11 +54,13 @@ export default function Step5Services({
   onBack,
 }: {
   form: RegistrationForm;
-  setForm: (f: RegistrationForm) => void;
+  setForm: React.Dispatch<React.SetStateAction<RegistrationForm>>;
   onNext: () => void;
   onBack: () => void;
 }) {
   const s = form.services;
+
+  const [topError, setTopError] = useState<string | null>(null);
 
   // Countries (for branches)
   const countries = useMemo(
@@ -58,8 +76,13 @@ export default function Step5Services({
   const toggle = (list: string[], value: string) =>
     list.includes(value) ? list.filter((x) => x !== value) : [...list, value];
 
-  const setServices = (patch: Partial<RegistrationForm["services"]>) =>
-    setForm({ ...form, services: { ...s, ...patch } });
+  const setServices = (patch: Partial<RegistrationForm["services"]>) => {
+    setTopError(null);
+    setForm((prev) => ({
+      ...prev,
+      services: { ...prev.services, ...patch },
+    }));
+  };
 
   const filteredCountries = useMemo(() => {
     const q = countryQuery.trim().toLowerCase();
@@ -83,12 +106,42 @@ export default function Step5Services({
       ? "Select countries where you operate or trade."
       : "Select countries where you have offices/branches or active operations.";
 
+  const goNext = () => {
+    const hasServices = (s.servicesProvided || []).length > 0;
+    const hasCore = (s.coreActivities || []).length > 0;
+    const hasCountries = (s.supportedCountries || []).length > 0;
+
+    if (!hasServices && !hasCore) {
+      setTopError("Please select at least one Service or Core Activity.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!hasCountries) {
+      setTopError(`Please select at least one country under "${branchesLabel}".`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setTopError(null);
+    onNext();
+  };
+
   return (
     <section className="container mt-6">
       <div className="rounded-2xl bg-white border border-gray-400 shadow p-5 md:p-6">
-        <h2 className="text-xl md:text-2xl font-semibold text-[var(--color-accent)] mb-4">
+        <h2 className="text-xl md:text-2xl font-semibold text-[var(--color-accent)] mb-2">
           Services & Activities
         </h2>
+        <p className="text-sm text-[var(--color-muted)] mb-4">
+          Select services, core activities, and the countries where you operate.
+        </p>
+
+        {topError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {topError}
+          </div>
+        )}
 
         <div className="grid gap-6">
           {/* Services Provided */}
@@ -118,6 +171,39 @@ export default function Step5Services({
                 );
               })}
             </div>
+          </div>
+
+          {/* Core Activities (NEW) */}
+          <div>
+            <h4 className="text-sm font-medium mb-2">Core Activities</h4>
+            <div className="flex flex-wrap gap-2">
+              {CORE_ACTIVITY_OPTIONS.map((opt) => {
+                const active = (s.coreActivities || []).includes(opt);
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() =>
+                      setServices({
+                        coreActivities: toggle(s.coreActivities || [], opt),
+                      })
+                    }
+                    className={`rounded-full border px-3 py-1 text-sm transition
+                      ${
+                        active
+                          ? "border-[var(--color-accent)] text-[var(--color-accent)] bg-[var(--color-accent)]/5"
+                          : "border-gray-300 hover:border-[var(--color-accent)]/60"
+                      }`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="text-xs text-[var(--color-muted)] mt-2">
+              Pick the main activities your company focuses on.
+            </p>
           </div>
 
           {/* Branches / Operating Countries (Search + checkbox list) */}
@@ -197,7 +283,9 @@ export default function Step5Services({
               )}
             </div>
 
-            <p className="text-xs text-[var(--color-muted)] mt-2">{branchesHelp}</p>
+            <p className="text-xs text-[var(--color-muted)] mt-2">
+              {branchesHelp}
+            </p>
           </div>
 
           {/* Service Sectors (free text) */}
@@ -214,12 +302,13 @@ export default function Step5Services({
 
         <div className="mt-5 flex justify-end gap-2">
           <button
+            type="button"
             onClick={onBack}
-            className="rounded-lg border border-gray-200 px-4 py-2"
+            className="rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-50"
           >
             Back
           </button>
-          <button onClick={onNext} className="btn-accent">
+          <button type="button" onClick={goNext} className="btn-accent">
             Next
           </button>
         </div>

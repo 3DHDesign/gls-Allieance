@@ -1,5 +1,6 @@
+// src/components/Registration/Step4CompanyProfile.tsx
+import { useEffect, useMemo, useState } from "react";
 import type { RegistrationForm } from "../../types/registration";
-import { useMemo, useState } from "react";
 import { FiUpload, FiX } from "react-icons/fi";
 
 export default function Step4CompanyProfile({
@@ -9,37 +10,45 @@ export default function Step4CompanyProfile({
   onBack,
 }: {
   form: RegistrationForm;
-  setForm: (f: RegistrationForm) => void;
+  setForm: React.Dispatch<React.SetStateAction<RegistrationForm>>;
   onNext: () => void;
   onBack: () => void;
 }) {
+  const isImporterExporter = form.profileType === "importer_exporter";
+
   const value = form.company.profileBrief || "";
   const [error, setError] = useState<string | null>(null);
-
-  const isImporterExporter = form.profileType === "importer_exporter";
 
   const countWords = (text: string) =>
     text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 
   const words = useMemo(() => countWords(value), [value]);
 
+  const setCompany = (patch: Partial<RegistrationForm["company"]>) => {
+    setForm((prev) => ({
+      ...prev,
+      company: { ...prev.company, ...patch },
+    }));
+  };
+
   const onChange = (text: string) => {
     const w = countWords(text);
+
     if (w <= 500) {
       setError(null);
-      setForm({ ...form, company: { ...form.company, profileBrief: text } });
-    } else {
-      const trimmed = text.trim().split(/\s+/).slice(0, 500).join(" ");
-      setForm({ ...form, company: { ...form.company, profileBrief: trimmed } });
-      setError("Limited to 500 words. Extra text was trimmed.");
+      setCompany({ profileBrief: text });
+      return;
     }
+
+    const trimmed = text.trim().split(/\s+/).slice(0, 500).join(" ");
+    setCompany({ profileBrief: trimmed });
+    setError("Limited to 500 words. Extra text was trimmed.");
   };
 
   // ✅ Cover photo upload (Importer/Exporter only)
   const onPickCover = (file: File | null) => {
     if (!file) return;
 
-    // basic validation
     if (!file.type.startsWith("image/")) {
       setError("Please upload a valid image file (JPG/PNG/WebP).");
       return;
@@ -51,35 +60,63 @@ export default function Step4CompanyProfile({
 
     setError(null);
 
-    const preview = URL.createObjectURL(file);
+    // revoke old preview if exists
+    const old = form.company.coverPhotoPreview;
+    if (old) URL.revokeObjectURL(old);
 
-    setForm({
-      ...form,
-      company: {
-        ...form.company,
-        coverPhoto: file,
-        coverPhotoPreview: preview,
-      },
+    const preview = URL.createObjectURL(file);
+    setCompany({
+      coverPhoto: file,
+      coverPhotoPreview: preview,
     });
   };
 
   const removeCover = () => {
-    const prev = form.company.coverPhotoPreview;
-    if (prev) URL.revokeObjectURL(prev);
+    const prevUrl = form.company.coverPhotoPreview;
+    if (prevUrl) URL.revokeObjectURL(prevUrl);
 
-    setForm({
-      ...form,
-      company: {
-        ...form.company,
-        coverPhoto: null,
-        coverPhotoPreview: "",
-      },
+    setCompany({
+      coverPhoto: null,
+      coverPhotoPreview: "",
     });
   };
+
+  // ✅ cleanup preview when component unmounts
+  useEffect(() => {
+    return () => {
+      const prevUrl = form.company.coverPhotoPreview;
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+    };
+    // run once on mount/unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ✅ you can decide if cover photo is required or optional
   const coverOk = !isImporterExporter || !!form.company.coverPhoto;
   const canNext = words > 0 && words <= 500 && coverOk;
+
+  const goNext = () => {
+    if (!value.trim()) {
+      setError("Please write a short company overview before continuing.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (words > 500) {
+      setError("Limited to 500 words.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (isImporterExporter && !form.company.coverPhoto) {
+      setError("Cover photo is required for Importer / Exporter profiles.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setError(null);
+    onNext();
+  };
 
   return (
     <section className="container mt-6">
@@ -97,9 +134,7 @@ export default function Step4CompanyProfile({
           <div className="mb-5">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-[var(--color-black)]">
-                  Cover Photo
-                </div>
+                <div className="font-medium text-gray-900">Cover Photo</div>
                 <div className="text-xs text-[var(--color-muted)]/80 mt-1">
                   Shown on your directory profile. Recommended: 1600×900.
                 </div>
@@ -150,6 +185,7 @@ export default function Step4CompanyProfile({
           onChange={(e) => onChange(e.target.value)}
           rows={8}
           className="w-full rounded-lg border border-gray-200 px-3 py-3"
+          placeholder="Write a short overview about your company, services, and markets..."
         />
 
         <div className="mt-2 flex items-center justify-between text-xs">
@@ -165,14 +201,16 @@ export default function Step4CompanyProfile({
 
         <div className="mt-5 flex justify-end gap-2">
           <button
+            type="button"
             onClick={onBack}
-            className="rounded-lg border border-gray-200 px-4 py-2"
+            className="rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-50"
           >
             Back
           </button>
 
           <button
-            onClick={onNext}
+            type="button"
+            onClick={goNext}
             disabled={!canNext}
             className="btn-accent disabled:opacity-50"
           >
