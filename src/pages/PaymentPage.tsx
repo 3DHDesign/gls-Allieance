@@ -3,41 +3,35 @@ import { useAuth } from "../context/AuthContext";
 import DashboardShell from "../components/DashboardShell";
 import { makePayment } from "../api/payment";
 
-type PayMethod = "transaction" | "cash";
-
 export default function PaymentPage() {
   const { user } = useAuth();
   const userId = user?.id;
 
-  const [amount, setAmount] = useState<string>("10000");
-  const [method, setMethod] = useState<PayMethod>("transaction");
-  const [transactionId, setTransactionId] = useState<string>("");
+  const [amount, setAmount] = useState("10000");
+  const [transactionId, setTransactionId] = useState("");
   const [slip, setSlip] = useState<File | null>(null);
 
   const [msg, setMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
 
+    // validations
     if (!userId) return setMsg("Login required.");
     if (!amount.trim()) return setMsg("Amount is required.");
+    if (!transactionId.trim()) return setMsg("Transaction ID required.");
     if (!slip) return setMsg("Upload slip.");
-    if (method === "transaction" && !transactionId.trim())
-      return setMsg("Transaction ID required.");
 
+    // build FormData (keys MUST match Postman)
     const fd = new FormData();
     fd.append("user_id", String(userId));
     fd.append("payment_type", "manual");
     fd.append("amount", amount.trim());
-    fd.append("payment_method", method);
-
-    // only send transaction_id when needed (cleaner for backend validation)
-    if (method === "transaction") fd.append("transaction_id", transactionId.trim());
-
-    // backend key MUST be "avidence" (typo is in backend)
-    fd.append("avidence", slip);
+    fd.append("payment_method", "transaction");
+    fd.append("transaction_id", transactionId.trim());
+    fd.append("avidness", slip); // ✅ EXACT KEY from Postman
 
     try {
       setLoading(true);
@@ -46,14 +40,10 @@ export default function PaymentPage() {
       setMsg(res?.message || "Payment submitted.");
       setSlip(null);
       setTransactionId("");
-      // keep amount as-is (or reset if you want)
-    } catch (err: unknown) {
-      const eAny = err as any;
-      setMsg(
-        eAny?.response?.data?.message ||
-          eAny?.message ||
-          "Payment failed."
-      );
+      // optionally reset amount:
+      // setAmount("10000");
+    } catch (err: any) {
+      setMsg(err?.response?.data?.message || err?.message || "Payment failed.");
     } finally {
       setLoading(false);
     }
@@ -65,9 +55,7 @@ export default function PaymentPage() {
         <h1 className="text-3xl font-bold" style={{ color: "var(--color-muted)" }}>
           Payment
         </h1>
-        <p className="mt-1 text-muted">
-          Upload slip for admin verification.
-        </p>
+        <p className="mt-1 text-muted">Upload slip for admin verification.</p>
 
         <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm max-w-xl">
           <form onSubmit={submit} className="space-y-4">
@@ -82,25 +70,12 @@ export default function PaymentPage() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Payment Method</label>
-              <select
-                className="w-full rounded-xl border px-3 py-3"
-                value={method}
-                onChange={(e) => setMethod(e.target.value as PayMethod)}
-              >
-                <option value="transaction">Transaction</option>
-                <option value="cash">Cash</option>
-              </select>
-            </div>
-
-            <div>
               <label className="block text-sm mb-1">Transaction ID</label>
               <input
                 className="w-full rounded-xl border px-3 py-3"
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
-                disabled={method !== "transaction"}
-                placeholder={method === "transaction" ? "Enter transaction ID" : "Not required for cash"}
+                placeholder="Enter transaction ID"
               />
             </div>
 

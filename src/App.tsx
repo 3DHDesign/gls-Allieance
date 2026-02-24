@@ -22,6 +22,7 @@ import ProfilePage from "./pages/ProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import AccountPage from "./pages/AccountPage";
 import VerifyOtp from "./pages/VerifyOtp";
+import FindExporterImporter from "./pages/FindExporterImporter";
 
 export default function App() {
   return (
@@ -48,6 +49,8 @@ export default function App() {
 <Route path="/forgot-password" element={<ForgotPassword />} />
 <Route path="/verify-otp" element={<VerifyOtp />} />
 <Route path="/reset-password" element={<ResetPassword />} />
+
+<Route path="/find-exporter" element={<FindExporterImporter />} />
 
         {/* fallback */}
         <Route path="*" element={<Home />} />

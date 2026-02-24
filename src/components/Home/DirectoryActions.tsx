@@ -26,7 +26,7 @@ export default function DirectoryActions() {
 
           {/* FIND EXPORTER / IMPORTER */}
           <Link
-            to="/find-exporter-importer"
+            to="/find-exporter"
             className="group w-full py-6 px-8 flex flex-col items-center gap-2 transition
                        hover:bg-[var(--color-accent)]"
           >

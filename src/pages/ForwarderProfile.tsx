@@ -1,24 +1,90 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FORWARDERS, type Forwarder } from "../utils/forwarders";
-import { FORWARDER_DETAILS } from "../utils/forwarderDetails";
 import { FiArrowLeft, FiExternalLink, FiMapPin, FiGlobe } from "react-icons/fi";
+import { getMemberById } from "../api/memberProfile";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="rounded-2xl border border-gray-200 bg-white p-5">{children}</div>;
 }
 
+function safeDate(d?: string) {
+  if (!d) return "";
+  const dt = new Date(d);
+  return Number.isNaN(dt.getTime()) ? d : dt.toLocaleDateString();
+}
+
 export default function ForwarderProfile() {
   const { id } = useParams<{ id: string }>();
-  const base: Forwarder | undefined = FORWARDERS.find((f) => f.id === id);
-  const d = id ? FORWARDER_DETAILS[id] : undefined;
 
-  if (!base) {
+  const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const run = async () => {
+      try {
+        setLoading(true);
+        setMsg(null);
+
+        const res = await getMemberById(id);
+        if (!res?.success || !res?.data) {
+          setMsg("Company not found.");
+          setData(null);
+          return;
+        }
+
+        setData(res.data);
+      } catch (e) {
+        setMsg("Failed to load profile. Please try again.");
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+  }, [id]);
+
+  const companyName = data?.company_name || data?.name || "Unnamed Company";
+  const country = data?.country || "-";
+  const city = data?.city || "-";
+  const website = data?.website || "";
+  const overview = data?.company_profile_overview || "";
+
+  const imageUrl =
+    data?.company_profile_image_url ||
+    data?.company_profile_image ||
+    ""; // depends on backend
+
+  const addressLines = useMemo(() => {
+    if (!data) return [];
+    const lines: string[] = [];
+    if (data.registered_address) lines.push(data.registered_address);
+    const line2 = [data.city, data.state_province, data.zip_code].filter(Boolean).join(", ");
+    if (line2) lines.push(line2);
+    if (data.country) lines.push(data.country);
+    return lines;
+  }, [data]);
+
+  if (loading) {
+    return (
+      <main className="container pt-24 pb-10">
+        <div className="rounded-2xl bg-white border border-gray-100 p-10 text-center text-muted">
+          Loading profile...
+        </div>
+      </main>
+    );
+  }
+
+  if (msg || !data) {
     return (
       <main className="container pt-24 pb-10">
         <Link to="/find-forwarder" className="inline-flex items-center gap-2 text-[var(--color-accent)]">
           <FiArrowLeft /> Back to directory
         </Link>
-        <h1 className="mt-4 text-2xl font-semibold">Company not found</h1>
+        <h1 className="mt-4 text-2xl font-semibold">{msg || "Company not found"}</h1>
       </main>
     );
   }
@@ -32,36 +98,55 @@ export default function ForwarderProfile() {
             <FiArrowLeft /> Back to directory
           </Link>
 
-          <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
+          <div className="mt-4 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div className="min-w-0">
               <h1 className="text-[28px] md:text-[36px] font-bold text-gray-900">
-                {base.name}
+                {companyName}
               </h1>
-              <div className="mt-1 flex items-center gap-2 text-sm text-muted">
+
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted">
                 <FiMapPin className="opacity-70" />
-                <span>{base.city}, {base.country}</span>
-                {typeof base.years === "number" && (
-                  <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-                    {base.years} {base.years === 1 ? "year" : "years"}
-                  </span>
-                )}
+                <span>{city}, {country}</span>
               </div>
+
+              {data?.ref_code && (
+                <div className="mt-2 text-xs text-muted">
+                  Ref: <span className="font-medium text-gray-800">{data.ref_code}</span>
+                  {data?.status ? (
+                    <span className="ml-2 rounded-full bg-gray-100 px-2 py-0.5">
+                      {String(data.status)}
+                    </span>
+                  ) : null}
+                </div>
+              )}
             </div>
 
-            {/* RIGHT SIDE: Website only (tags removed) */}
+            {/* right buttons */}
             <div className="flex items-center gap-2">
-              {d?.contacts?.website && (
+              {website ? (
                 <a
-                  href={d.contacts.website}
+                  href={website}
                   target="_blank"
                   rel="noreferrer"
                   className="btn-accent inline-flex items-center gap-2"
                 >
                   <FiGlobe /> Website
                 </a>
-              )}
+              ) : null}
             </div>
           </div>
+
+          {/* optional company image */}
+          {imageUrl ? (
+            <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white">
+              <img
+                src={imageUrl}
+                alt={companyName}
+                className="w-full h-[240px] md:h-[320px] object-cover"
+                loading="lazy"
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -70,68 +155,52 @@ export default function ForwarderProfile() {
         <div className="container grid gap-6 lg:grid-cols-3 py-6">
           {/* Left column */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Memberships (logos & code badges removed) */}
-            <Card>
-              <h3 className="text-lg font-semibold mb-3">Memberships & Affiliations</h3>
-              {d?.enrolledSince && (
-                <p className="text-sm text-muted mb-3">
-                  Proudly enrolled since:{" "}
-                  <span className="font-medium">
-                    {new Date(d.enrolledSince).toLocaleDateString()}
-                  </span>
-                </p>
-              )}
-
-              {d?.memberships?.length ? (
-                <ul className="grid gap-3 sm:grid-cols-2">
-                  {d.memberships.map((m, i) => (
-                    <li key={i} className="rounded-lg border border-gray-200 p-3">
-                      <div className="font-medium">{m.name}</div>
-                      {m.expires && (
-                        <div className="text-xs text-muted mt-0.5">
-                          Expires: {new Date(m.expires).toLocaleDateString()}
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted">No memberships recorded.</p>
-              )}
-            </Card>
-
             {/* Overview */}
             <Card>
               <h3 className="text-lg font-semibold mb-3">Profile</h3>
-              <p className="text-sm leading-7">
-                {d?.overview ?? "Company overview coming soon."}
+              <p className="text-sm leading-7 text-gray-700">
+                {overview || "Company overview coming soon."}
               </p>
-              {!!d?.services?.length && (
+
+              {/* exporter/importer extra bits */}
+              {(data?.export_subcategories?.length || data?.export_main_categories?.length) ? (
                 <>
-                  <h4 className="mt-4 font-medium">Services</h4>
-                  <ul className="mt-2 list-disc pl-5 text-sm space-y-1">
-                    {d.services.map((s, i) => <li key={i}>{s}</li>)}
-                  </ul>
+                  <h4 className="mt-4 font-medium">Categories</h4>
+
+                  {!!data?.export_main_categories?.length && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {data.export_main_categories.map((c: any) => (
+                        <span
+                          key={c.id ?? c.name}
+                          className="rounded-full border border-gray-200 px-2.5 py-1 text-xs bg-gray-50"
+                        >
+                          {c.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {!!data?.export_subcategories?.length && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {data.export_subcategories.map((c: string) => (
+                        <span
+                          key={c}
+                          className="rounded-full border border-gray-200 px-2.5 py-1 text-xs"
+                        >
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </>
-              )}
-              {!!d?.core?.length && (
+              ) : null}
+
+              {!!data?.core_activities?.length && (
                 <>
                   <h4 className="mt-4 font-medium">Core Activities</h4>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {d.core.map((c, i) => (
-                      <span key={i} className="rounded-full border border-gray-200 px-2.5 py-1 text-xs bg-gray-50">
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              )}
-              {!!d?.sectors?.length && (
-                <>
-                  <h4 className="mt-4 font-medium">Sectors</h4>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {d.sectors.map((c, i) => (
-                      <span key={i} className="rounded-full border border-gray-200 px-2.5 py-1 text-xs bg-gray-50">
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {data.core_activities.map((c: string) => (
+                      <span key={c} className="rounded-full border border-gray-200 px-2.5 py-1 text-xs bg-gray-50">
                         {c}
                       </span>
                     ))}
@@ -143,17 +212,17 @@ export default function ForwarderProfile() {
             {/* Office Contacts */}
             <Card>
               <h3 className="text-lg font-semibold mb-3">Office Contacts</h3>
-              {d?.officeContacts?.length ? (
+              {data?.contacts?.length ? (
                 <div className="space-y-4">
-                  {d.officeContacts.map((p, i) => (
+                  {data.contacts.map((p: any, i: number) => (
                     <div key={i} className="rounded-lg border border-gray-200 p-3">
-                      <div className="font-medium">{p.name}</div>
-                      {p.title && <div className="text-sm text-muted">{p.title}</div>}
+                      <div className="font-medium">{p.full_name || "Contact"}</div>
+                      {p.designation ? <div className="text-sm text-muted">{p.designation}</div> : null}
+
                       <div className="mt-2 grid gap-1 text-sm">
-                        {p.email && (<div><span className="font-medium">Email:</span> {p.email}</div>)}
-                        {p.phone && (<div><span className="font-medium">Phone:</span> {p.phone}</div>)}
-                        {p.mobile && (<div><span className="font-medium">Mobile:</span> {p.mobile}</div>)}
-                        {p.directLine && (<div><span className="font-medium">Direct Line:</span> {p.directLine}</div>)}
+                        {p.email ? (<div><span className="font-medium">Email:</span> {p.email}</div>) : null}
+                        {p.phone ? (<div><span className="font-medium">Phone:</span> {p.phone}</div>) : null}
+                        {p.alternate_phone ? (<div><span className="font-medium">Alt:</span> {p.alternate_phone}</div>) : null}
                       </div>
                     </div>
                   ))}
@@ -169,9 +238,9 @@ export default function ForwarderProfile() {
             {/* Address */}
             <Card>
               <h3 className="text-lg font-semibold mb-3">Address</h3>
-              {d?.address?.length ? (
+              {addressLines.length ? (
                 <address className="not-italic text-sm leading-7 text-gray-700">
-                  {d.address.map((ln, i) => <div key={i}>{ln}</div>)}
+                  {addressLines.map((ln, i) => <div key={i}>{ln}</div>)}
                 </address>
               ) : (
                 <p className="text-sm text-muted">Address not available.</p>
@@ -182,21 +251,35 @@ export default function ForwarderProfile() {
             <Card>
               <h3 className="text-lg font-semibold mb-3">Contact Details</h3>
               <div className="grid gap-1 text-sm">
-                {d?.contacts?.phone && (<div><span className="font-medium">Phone:</span> {d.contacts.phone}</div>)}
-                {d?.contacts?.fax && (<div><span className="font-medium">Fax:</span> {d.contacts.fax}</div>)}
-                {d?.contacts?.emergency && (<div><span className="font-medium">Emergency Call:</span> {d.contacts.emergency}</div>)}
-                {d?.contacts?.website && (
+                {website ? (
                   <div className="inline-flex items-center gap-2">
                     <span className="font-medium">Website:</span>
-                    <a className="text-[var(--color-accent)] inline-flex items-center gap-1"
-                       href={d.contacts.website} target="_blank" rel="noreferrer">
-                      {d.contacts.website} <FiExternalLink />
+                    <a
+                      className="text-[var(--color-accent)] inline-flex items-center gap-1"
+                      href={website}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {website} <FiExternalLink />
                     </a>
                   </div>
+                ) : (
+                  <p className="text-sm text-muted">No website provided.</p>
                 )}
-                {d?.contacts?.email && (<div><span className="font-medium">Email:</span> {d.contacts.email}</div>)}
               </div>
             </Card>
+
+            {/* BRC (if exists) */}
+            {(data?.brc_number || data?.brc_issue_date || data?.brc_expiry_date) ? (
+              <Card>
+                <h3 className="text-lg font-semibold mb-3">Business Registration (BRC)</h3>
+                <div className="grid gap-1 text-sm">
+                  {data.brc_number ? <div><span className="font-medium">BRC No:</span> {data.brc_number}</div> : null}
+                  {data.brc_issue_date ? <div><span className="font-medium">Issued:</span> {safeDate(data.brc_issue_date)}</div> : null}
+                  {data.brc_expiry_date ? <div><span className="font-medium">Expiry:</span> {safeDate(data.brc_expiry_date)}</div> : null}
+                </div>
+              </Card>
+            ) : null}
           </aside>
         </div>
       </section>

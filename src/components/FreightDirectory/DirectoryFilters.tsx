@@ -1,5 +1,8 @@
-import { FiRefreshCcw, FiSearch } from "react-icons/fi"; 
+// src/components/FreightDirectory/DirectoryFilters.tsx
+import { FiRefreshCcw, FiSearch } from "react-icons/fi";
 import { CITY_MAP, COUNTRIES } from "../../utils/forwarders";
+
+type SimpleOption = { label: string; value: string };
 
 type Props = {
   country: string; setCountry: (v: string) => void;
@@ -8,12 +11,23 @@ type Props = {
   orderBy: string; setOrderBy: (v: string) => void;
   onReset: () => void;
   onInteract: () => void;
+
+  // ✅ optional category filters (for importer/exporter page)
+  mainCategoryId?: string;
+  setMainCategoryId?: (v: string) => void;
+  subCategoryId?: string;
+  setSubCategoryId?: (v: string) => void;
+  mainCategories?: SimpleOption[];
+  subCategories?: SimpleOption[];
 };
 
 export default function DirectoryFilters(p: Props) {
-  const cities = p.country
-    ? ["All Cities", ...(CITY_MAP[p.country as keyof typeof CITY_MAP] ?? [])]
-    : [];
+  const cities =
+    p.country ? ["All Cities", ...(CITY_MAP[p.country as keyof typeof CITY_MAP] ?? [])] : [];
+
+  const hasCategoryFilters =
+    typeof p.setMainCategoryId === "function" &&
+    typeof p.setSubCategoryId === "function";
 
   return (
     <section className="container mt-8">
@@ -33,22 +47,18 @@ export default function DirectoryFilters(p: Props) {
           </button>
         </div>
 
-        {/* ONE ROW controls (wraps on small screens) */}
-        <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+        {/* controls */}
+        <div className="flex flex-col lg:flex-row lg:items-end gap-4 flex-wrap">
           {/* Country */}
           <div className="flex-1 min-w-[220px]">
             <label className="block text-sm mb-1 text-muted">Country</label>
             <select
               value={p.country}
               onChange={(e) => { p.onInteract(); p.setCountry(e.target.value); p.setCity(""); }}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             >
-              <option value="" disabled hidden>
-                Select country
-              </option>
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              <option value="" disabled hidden>Select country</option>
+              {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
@@ -61,14 +71,49 @@ export default function DirectoryFilters(p: Props) {
               disabled={!p.country}
               className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="" disabled hidden>
-                Select city
-              </option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              <option value="" disabled hidden>Select city</option>
+              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+
+          {/* ✅ Main Category */}
+          {hasCategoryFilters && (
+            <div className="flex-1 min-w-[240px]">
+              <label className="block text-sm mb-1 text-muted">Main Category</label>
+              <select
+                value={p.mainCategoryId || ""}
+                onChange={(e) => {
+                  p.onInteract();
+                  p.setMainCategoryId?.(e.target.value);
+                  p.setSubCategoryId?.(""); // reset sub when main changes
+                }}
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              >
+                <option value="">All</option>
+                {(p.mainCategories ?? []).map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* ✅ Sub Category */}
+          {hasCategoryFilters && (
+            <div className="flex-1 min-w-[240px]">
+              <label className="block text-sm mb-1 text-muted">Sub Category</label>
+              <select
+                value={p.subCategoryId || ""}
+                onChange={(e) => { p.onInteract(); p.setSubCategoryId?.(e.target.value); }}
+                disabled={!p.mainCategoryId}
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <option value="">All</option>
+                {(p.subCategories ?? []).map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Keyword */}
           <div className="flex-[1.6] min-w-[280px]">
@@ -92,9 +137,7 @@ export default function DirectoryFilters(p: Props) {
               onChange={(e) => { p.onInteract(); p.setOrderBy(e.target.value); }}
               className="w-full rounded-lg border border-gray-200 bg-white px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
             >
-              <option value="" disabled hidden>
-                Order by
-              </option>
+              <option value="" disabled hidden>Order by</option>
               <option>Country - City</option>
               <option>A - Z</option>
               <option>Years (Newest)</option>
