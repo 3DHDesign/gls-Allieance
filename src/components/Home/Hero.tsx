@@ -16,10 +16,7 @@ const fadeUp: Variants = {
   show: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
-    },
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
@@ -83,6 +80,11 @@ export default function Hero() {
     slidesToShow: 1,
     slidesToScroll: 1,
     beforeChange: (_old, next) => setCurrent(next),
+    appendDots: (dots) => (
+      <div style={{ bottom: 22 }}>
+        <ul style={{ margin: 0 }}>{dots}</ul>
+      </div>
+    ),
   };
 
   if (loading || slides.length === 0) {
@@ -96,12 +98,12 @@ export default function Hero() {
   const slide = slides[current];
 
   return (
-    <section className="relative min-h-[60vh] md:min-h-[80vh]">
+    <section className="relative min-h-[68vh] md:min-h-[80vh]">
       {/* background slider */}
       <div className="absolute inset-0">
         <Slider {...settings} className="h-full">
           {slides.map((s) => (
-            <div key={s.id} className="h-[60vh] md:h-[80vh]">
+            <div key={s.id} className="h-[68vh] md:h-[80vh]">
               <div
                 className="h-full w-full bg-no-repeat bg-center bg-cover"
                 style={{ backgroundImage: `url(${s.image})` }}
@@ -109,33 +111,55 @@ export default function Hero() {
             </div>
           ))}
         </Slider>
-        <div className="absolute inset-0 bg-black/50" />
+
+        {/* overlay for readability */}
+        <div className="absolute inset-0 bg-black/55" />
+        {/* extra subtle gradient for “premium” feel */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
       </div>
 
       {/* content */}
-      <div className="relative z-10 flex items-center justify-center h-[60vh] md:h-[80vh] text-center px-4">
-        <motion.div
-          key={slide.id}
-          initial="hidden"
-          animate="show"
-          variants={fadeUp}
-        >
-          <h1
-            className="mb-3"
-            style={{ textShadow: "0 2px 18px rgba(0,0,0,0.45)" }}
-          >
-            {slide.title}
-          </h1>
-
-          <motion.p
-            className="hero-sub"
-            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}
+      <div className="relative z-10 h-[68vh] md:h-[80vh] flex items-center">
+        <div className="container-wide w-full px-4">
+          <motion.div
+            key={slide.id}
+            initial="hidden"
+            animate="show"
             variants={fadeUp}
-            transition={{ delay: 0.18 }}
+            className="mx-auto max-w-3xl text-center"
           >
-            {slide.subtitle}
-          </motion.p>
-        </motion.div>
+            {/* Override global h1 sizes with responsive Tailwind */}
+            <h1
+              className="text-[30px] leading-[38px] sm:text-[36px] sm:leading-[44px] md:text-[48px] md:leading-[56px] font-bold text-white"
+              style={{ textShadow: "0 2px 18px rgba(0,0,0,0.45)" }}
+            >
+              {slide.title}
+            </h1>
+
+            {/* Override global p sizes too */}
+            <motion.p
+              variants={fadeUp}
+              transition={{ delay: 0.18 }}
+              className="mt-3 text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] md:text-[20px] md:leading-[30px] text-white/90 font-normal"
+              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}
+            >
+              {slide.subtitle}
+            </motion.p>
+
+            {/* Optional CTA (remove if you don’t want) */}
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <a href="/directory" className="btn-accent">
+                Browse Directory
+              </a>
+              <a
+                href="/member-registration"
+                className="px-6 py-3 rounded-lg border border-white/35 text-white font-medium hover:bg-white/10 transition"
+              >
+                Become a Member
+              </a>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
