@@ -31,9 +31,9 @@ export default function Header() {
     ? "bg-white/95 backdrop-blur shadow-sm"
     : "bg-black/30 backdrop-blur-sm";
 
-  const brandColor = scrolled
-    ? "text-[var(--color-muted)]"
-    : "text-[var(--color-primary)]";
+  // const brandColor = scrolled
+  //   ? "text-[var(--color-muted)]"
+  //   : "text-[var(--color-primary)]";
 
   const linkColor = scrolled
     ? "text-[var(--color-muted)] hover:text-[var(--color-accent)]"

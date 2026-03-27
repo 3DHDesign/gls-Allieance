@@ -1,6 +1,6 @@
 // src/pages/FindExporterImporter.tsx
 import { useEffect, useMemo, useState } from "react";
-import DirectoryFilters from "../components/FreightDirectory/DirectoryFilters";
+import  DirectoryFilters from "../components/FreightDirectory/DirectoryFilters";
 import ResultRow from "../components/FreightDirectory/ResultRow";
 import ExportCategorySidebar from "../components/FreightDirectory/ExportCategorySidebar";
 import {
@@ -163,6 +163,7 @@ export default function FindExporterImporter() {
 
       {/* Top Filters */}
       <DirectoryFilters
+       profileType="importer_exporter" 
         country={country}
         setCountry={setCountry}
         city={city}

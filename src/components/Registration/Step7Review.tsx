@@ -146,6 +146,7 @@ export default function Step7Review({
             {isImporterExporter && (
               <>
                 <div className="mt-3 border-t border-gray-200 pt-3" />
+                
                 <Row label="Main Product Category" value={categoryLabel} />
                 <Row
                   label="Sub Categories"
@@ -210,7 +211,7 @@ export default function Step7Review({
                   <Row label="Name" value={a.name} />
                   <Row label="Issue Date" value={a.issueDate} />
                   <Row label="Expiry Date" value={a.expiryDate} />
-                  <Row label="Country" value={a.country} />
+                  {/* <Row label="Country" value={a.country} /> */}
                 </div>
               ))
             ) : (

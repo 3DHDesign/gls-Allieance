@@ -1,12 +1,6 @@
-// src/api/member-registration.ts
 import http from "./http";
 import type { RegistrationForm } from "../types/registration";
 import { Country } from "country-state-city";
-import {
-  getCategories,
-  normalizeCategories,
-  type CategoryNode,
-} from "./categories";
 
 /**
  * Convert ISO2 -> Country name
@@ -25,48 +19,8 @@ function boolTo10(v?: boolean | null) {
   return "";
 }
 
-function flattenCategories(tree: CategoryNode[]) {
-  const list: { id: string; name: string; parentId: string | null }[] = [];
-
-  const walk = (nodes: CategoryNode[]) => {
-    nodes.forEach((node) => {
-      list.push({
-        id: String(node.id),
-        name: node.name,
-        parentId: node.parentId,
-      });
-      if (node.children?.length) walk(node.children);
-    });
-  };
-
-  walk(tree);
-  return list;
-}
-
-async function getCategoryNameMap() {
-  const data = await getCategories();
-  const tree = normalizeCategories(data);
-  const flat = flattenCategories(tree);
-
-  const map = new Map<string, string>();
-  flat.forEach((c) => map.set(String(c.id), c.name));
-  return map;
-}
-
 export async function buildMemberRegistrationFormData(form: RegistrationForm) {
   const fd = new FormData();
-
-  // category id -> name map
-  const categoryMap = await getCategoryNameMap();
-
-  const mainCategoryName = form.company.productCategoryId
-    ? categoryMap.get(String(form.company.productCategoryId)) ||
-      String(form.company.productCategoryId)
-    : "";
-
-  const subCategoryNames = (form.company.productSubcategories || []).map(
-    (id) => categoryMap.get(String(id)) || String(id)
-  );
 
   // ---------------------------
   // STEP 0/1 : Profile + Username
@@ -87,16 +41,15 @@ export async function buildMemberRegistrationFormData(form: RegistrationForm) {
   fd.append("city", form.company.regCity || "");
   fd.append("zip_code", form.company.regZip || "");
 
-  // ✅ send category NAMES, not raw IDs
- // main category must be sent as raw ID for backend validation
-if (form.company.productCategoryId) {
-  fd.append("category_ids[]", String(form.company.productCategoryId));
-}
+  // main category must be sent as raw ID for backend validation
+  if (form.company.productCategoryId) {
+    fd.append("category_ids[]", String(form.company.productCategoryId));
+  }
 
-// keep subcategories too
-(form.company.productSubcategories || []).forEach((subId) => {
-  fd.append("export_subcategories[]", String(subId));
-});
+  // subcategories
+  (form.company.productSubcategories || []).forEach((subId) => {
+    fd.append("export_subcategories[]", String(subId));
+  });
 
   const fin = boolTo10(form.company.financialProtectionRequired);
   const net = boolTo10(form.company.nettingRequired);
@@ -126,7 +79,6 @@ if (form.company.productCategoryId) {
   fd.append("brc_issue_date", form.business.issueDate || "");
   fd.append("brc_expiry_date", form.business.expiryDate || "");
 
-  // ✅ exact backend key
   if (form.business.brcFile instanceof File) {
     fd.append("brc_document_url", form.business.brcFile);
   }
@@ -162,7 +114,6 @@ if (form.company.productCategoryId) {
   // ---------------------------
   fd.append("company_profile_overview", form.company.profileBrief || "");
 
-  // ✅ exact backend key
   if (form.company.coverPhoto instanceof File) {
     fd.append("company_profile_image_url", form.company.coverPhoto);
   }
@@ -213,7 +164,6 @@ if (form.company.productCategoryId) {
     fd.append("insurance_expiry_date", form.insurance.expiryDate);
   }
 
-  // ✅ exact backend key
   if (form.insurance.policyDoc instanceof File) {
     fd.append("insurance_policy_document_url", form.insurance.policyDoc);
   }
@@ -244,10 +194,21 @@ if (form.company.productCategoryId) {
  * Final submit
  */
 export async function submitMemberRegistration(form: RegistrationForm) {
-
-  console.log("brcFile", form.business.brcFile, form.business.brcFile instanceof File);
-  console.log("coverPhoto", form.company.coverPhoto, form.company.coverPhoto instanceof File);
-  console.log("policyDoc", form.insurance.policyDoc, form.insurance.policyDoc instanceof File);
+  console.log(
+    "brcFile",
+    form.business.brcFile,
+    form.business.brcFile instanceof File
+  );
+  console.log(
+    "coverPhoto",
+    form.company.coverPhoto,
+    form.company.coverPhoto instanceof File
+  );
+  console.log(
+    "policyDoc",
+    form.insurance.policyDoc,
+    form.insurance.policyDoc instanceof File
+  );
 
   const fd = await buildMemberRegistrationFormData(form);
 

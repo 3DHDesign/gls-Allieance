@@ -151,6 +151,7 @@ export default function FindForwarder() {
       </section>
 
       <DirectoryFilters
+        profileType="freight_forwarder"
         country={country} setCountry={setCountry}
         city={city} setCity={setCity}
         keyword={keyword} setKeyword={setKeyword}
