@@ -104,9 +104,9 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-[70vh] pb-16 bg-green-100">
-      <section className="container pt-10 md:pt-14">
+      <section className="container pt-10 md:pt-18">
         <h1 className="text-[28px] md:text-[42px] leading-tight font-bold text-[var(--color-accent)]">
-          Events & Meetups
+          Events & Meetup
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
           Discover upcoming GLS Alliance gatherings, workshops, and expos.

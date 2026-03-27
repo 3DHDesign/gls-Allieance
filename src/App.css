@@ -29,6 +29,11 @@
     @apply font-sans bg-primary text-muted;
   }
 
+  @font-face {
+    font-family: "Broadway";
+    src: url("/fonts/Broadway.ttf") format("truetype");
+  }
+  
   /* NAV default color = white from theme */
   nav, nav a, .nav-link {
     font-size: 14px;

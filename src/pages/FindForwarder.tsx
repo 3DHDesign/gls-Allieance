@@ -141,7 +141,7 @@ export default function FindForwarder() {
 
   return (
     <main className="min-h-[70vh] pb-16">
-      <section className="container pt-10 md:pt-14">
+      <section className="container pt-10 md:pt-18">
         <h1 className="text-[28px] md:text-[42px] leading-tight font-bold text-[var(--color-accent)]">
           Find a Freight Forwarder
         </h1>

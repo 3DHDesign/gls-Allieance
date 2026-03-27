@@ -72,13 +72,13 @@ export default function About() {
             <h2 className="text-[var(--color-black)]">How GLS Alliance Works</h2>
             <div className="mt-4 space-y-4">
               <Step num="01" title="Create / Update Profile">
-                Add your company details, locations, and specialties.
+              Add your company information, locations, and areas of expertise to showcase your capabilities.
               </Step>
               <Step num="02" title="Get Discovered by Country">
-                Appear under origin countries and relevant regions.
+              Be listed under relevant origin countries and regions, making it easier for partners to find you.
               </Step>
               <Step num="03" title="Connect &amp; Collaborate">
-                Receive inquiries and build partnerships.
+              Receive inquiries, engage with potential partners, and build meaningful collaborations.
               </Step>
             </div>
           </Card>

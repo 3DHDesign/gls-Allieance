@@ -1,4 +1,3 @@
-// src/App.tsx  (add the two routes)
 import "./App.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -16,13 +15,14 @@ import EventDetail from "./pages/EventDetail";
 
 import LoginPage from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword"; 
+import ResetPassword from "./pages/ResetPassword";
 import DashboardHome from "./pages/DashboardHome";
 import ProfilePage from "./pages/ProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import AccountPage from "./pages/AccountPage";
 import VerifyOtp from "./pages/VerifyOtp";
 import FindExporterImporter from "./pages/FindExporterImporter";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -30,8 +30,7 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-
-        <Route path="/login" element={<LoginPage />} /> 
+        <Route path="/login" element={<LoginPage />} />
 
         <Route path="/find-forwarder" element={<FindForwarder />} />
         <Route path="/events" element={<EventsPage />} />
@@ -42,15 +41,44 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/forwarder/:id" element={<ForwarderProfile />} />
-        <Route path="/account" element={<AccountPage />} />
-        <Route path="/dashboard" element={<DashboardHome />} />
-<Route path="/profile" element={<ProfilePage />} />
-<Route path="/payment" element={<PaymentPage />} /> 
-<Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/verify-otp" element={<VerifyOtp />} />
-<Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/find-exporter" element={<FindExporterImporter />} />
 
-<Route path="/find-exporter" element={<FindExporterImporter />} />
+        {/* Protected Routes */}
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute>
+              <AccountPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* fallback */}
         <Route path="*" element={<Home />} />

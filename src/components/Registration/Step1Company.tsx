@@ -1,12 +1,13 @@
-// src/components/Registration/Step1Company.tsx
-import { useMemo, useState } from "react";
+ // src/components/Registration/Step1Company.tsx
+import { useEffect, useMemo, useState } from "react";
 import { Country } from "country-state-city";
 import type { RegistrationForm, Contact } from "../../types/registration";
 import PhoneInput from "react-phone-input-2";
 import {
-  productCategories,
-  subcategoriesByCategory,
-} from "../../utils/exportCategories";
+  getCategories,
+  normalizeCategories,
+  type CategoryNode,
+} from "../../api/categories";
 
 export default function Step1Company({
   form,
@@ -25,6 +26,40 @@ export default function Step1Company({
   const selectedSubcats = form.company.productSubcategories ?? [];
 
   const [topError, setTopError] = useState<string | null>(null);
+
+  // ✅ categories from API
+  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
+  const [catLoading, setCatLoading] = useState(false);
+  const [catError, setCatError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isImporterExporter) return;
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        setCatLoading(true);
+        setCatError(null);
+
+        const data = await getCategories();
+        const tree = normalizeCategories(data);
+
+        if (!mounted) return;
+        setCategoryTree(tree);
+      } catch (e) {
+        if (!mounted) return;
+        setCategoryTree([]);
+        setCatError("Failed to load categories. Please try again.");
+      } finally {
+        if (mounted) setCatLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isImporterExporter]);
 
   // ✅ functional update = prevents overwrite/stale state bug
   const setCompany = (patch: Partial<RegistrationForm["company"]>) => {
@@ -96,7 +131,7 @@ export default function Step1Company({
     ? String(form.company.regCountryCode).toLowerCase()
     : "us";
 
-  // ---------- Product category + subcategories ----------
+  // ---------- Product category + subcategories (API) ----------
   const handleCategoryCardClick = (id: string) => {
     setTopError(null);
 
@@ -111,12 +146,12 @@ export default function Step1Company({
     }));
   };
 
-  const handleSubcategoryToggle = (sub: string, checked: boolean) => {
+  const handleSubcategoryToggle = (subId: string, checked: boolean) => {
     setForm((prev) => {
       const current = prev.company.productSubcategories ?? [];
       const next = checked
-        ? Array.from(new Set([...current, sub]))
-        : current.filter((s) => s !== sub);
+        ? Array.from(new Set([...current, subId]))
+        : current.filter((s) => s !== subId);
 
       return {
         ...prev,
@@ -206,9 +241,7 @@ export default function Step1Company({
             <h4 className="text-sm font-medium mb-2">Registered Address</h4>
             <textarea
               value={form.company.registeredAddress || ""}
-              onChange={(e) =>
-                setCompany({ registeredAddress: e.target.value })
-              }
+              onChange={(e) => setCompany({ registeredAddress: e.target.value })}
               className="w-full rounded-lg border border-gray-200 px-3 py-3"
               placeholder="Street / building / floor"
             />
@@ -274,83 +307,99 @@ export default function Step1Company({
               relevant sub-categories.
             </p>
 
+            {catError && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {catError}
+              </div>
+            )}
+
             <label className="block text-sm mb-2 font-medium">
               Main Product Category *
             </label>
 
-            <div className="grid gap-3 md:grid-cols-2">
-              {productCategories.map((cat) => {
-                const selected = selectedCategoryId === cat.id;
-                const subcats = subcategoriesByCategory[cat.id] || [];
+            {catLoading ? (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-muted">
+                Loading categories...
+              </div>
+            ) : categoryTree.length === 0 ? (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-muted">
+                No categories found.
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                {categoryTree.map((cat) => {
+                  const selected = selectedCategoryId === cat.id;
+                  const subcats = cat.children || [];
 
-                return (
-                  <div
-                    key={cat.id}
-                    className="rounded-xl border bg-white px-4 py-3 transition border-gray-200"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleCategoryCardClick(cat.id)}
-                      className={`relative w-full text-left rounded-lg px-1 py-1 transition
-                        ${
-                          selected
-                            ? "bg-[var(--color-accent)]/5"
-                            : "hover:bg-gray-50"
-                        }`}
+                  return (
+                    <div
+                      key={cat.id}
+                      className="rounded-xl border bg-white px-4 py-3 transition border-gray-200"
                     >
-                      {selected && (
-                        <span className="absolute right-0 top-0 rounded-full bg-[var(--color-accent)] text-white text-[10px] px-2 py-[2px]">
-                          Selected
-                        </span>
-                      )}
-                      <div className="text-sm font-medium text-gray-900 pr-12">
-                        {cat.label}
-                      </div>
-                    </button>
-
-                    {selected && (
-                      <div className="mt-3">
-                        <p className="text-xs font-medium text-[var(--color-muted)] mb-2">
-                          Sub Categories
-                        </p>
-
-                        {subcats.length > 0 ? (
-                          <div className="grid gap-2">
-                            {subcats.map((sub) => {
-                              const checked = selectedSubcats.includes(sub);
-                              return (
-                                <label
-                                  key={sub}
-                                  className="flex items-center gap-2 text-sm cursor-pointer"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300"
-                                    checked={checked}
-                                    onChange={(e) =>
-                                      handleSubcategoryToggle(
-                                        sub,
-                                        e.target.checked
-                                      )
-                                    }
-                                  />
-                                  <span>{sub}</span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <p className="text-xs text-[var(--color-muted)]">
-                            Sub-categories for this category have not been added
-                            yet.
-                          </p>
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryCardClick(cat.id)}
+                        className={`relative w-full text-left rounded-lg px-1 py-1 transition
+                          ${
+                            selected
+                              ? "bg-[var(--color-accent)]/5"
+                              : "hover:bg-gray-50"
+                          }`}
+                      >
+                        {selected && (
+                          <span className="absolute right-0 top-0 rounded-full bg-[var(--color-accent)] text-white text-[10px] px-2 py-[2px]">
+                            Selected
+                          </span>
                         )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        <div className="text-sm font-medium text-gray-900 pr-12">
+                          {cat.name}
+                        </div>
+                      </button>
+
+                      {selected && (
+                        <div className="mt-3">
+                          <p className="text-xs font-medium text-[var(--color-muted)] mb-2">
+                            Sub Categories
+                          </p>
+
+                          {subcats.length > 0 ? (
+                            <div className="grid gap-2">
+                              {subcats.map((sub) => {
+                                const checked = selectedSubcats.includes(sub.id);
+
+                                return (
+                                  <label
+                                    key={sub.id}
+                                    className="flex items-center gap-2 text-sm cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      className="h-4 w-4 rounded border-gray-300"
+                                      checked={checked}
+                                      onChange={(e) =>
+                                        handleSubcategoryToggle(
+                                          sub.id,
+                                          e.target.checked
+                                        )
+                                      }
+                                    />
+                                    <span>{sub.name}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-[var(--color-muted)]">
+                              No sub-categories available for this category yet.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -420,9 +469,7 @@ export default function Step1Company({
                     <input
                       type="email"
                       value={c.email || ""}
-                      onChange={(e) =>
-                        updateContact(i, { email: e.target.value })
-                      }
+                      onChange={(e) => updateContact(i, { email: e.target.value })}
                       className="w-full rounded-lg border border-gray-200 px-3 py-3"
                       placeholder="name@company.com"
                     />

@@ -51,16 +51,20 @@ export default function Header() {
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition ${headerBg}`}>
       <div className="container flex items-center justify-between py-4">
-        <a
-          href="/"
-          className={`${brandColor} text-2xl font-semibold tracking-wide transition-colors`}
-        >
-          GLS <span className="font-bold">Alliance</span>
-        </a>
+      <a href="/" className="text-2xl font-semibold tracking-wide">
+      <span style={{ fontFamily: "Broadway", color: "#001D57" }}>G</span>
+  <span style={{ fontFamily: "Broadway", color: "#007A00" }}>L</span>
+ 
+  <span style={{ fontFamily: "Broadway", color: "#06328C" }}>S</span>{" "}
+  <span className="font-bold" style={{ color: "#001D57" }}>
+    Alliance
+  </span>
+</a>
 
+        {/* ✅ show burger until 1024px */}
         <button
           aria-label="Toggle menu"
-          className="md:hidden relative h-8 w-9"
+          className="lg:hidden relative h-8 w-9"
           onClick={() => setOpen((s) => !s)}
         >
           <span
@@ -80,7 +84,8 @@ export default function Header() {
           />
         </button>
 
-        <nav className="hidden md:flex items-center gap-8">
+        {/* ✅ desktop nav starts from 1024px */}
+        <nav className="hidden lg:flex items-center gap-8">
           {nav.map((n) => (
             <a key={n.label} href={n.href} className={`${linkColor} transition-colors`}>
               {n.label}
@@ -140,12 +145,14 @@ export default function Header() {
         </nav>
       </div>
 
+      {/* ✅ mobile/tablet menu works up to 1024px now */}
       <div
-        className={`md:hidden bg-[#030b29]/95 backdrop-blur-sm transition-[max-height] overflow-hidden ${
+        className={`lg:hidden bg-[#030b29]/95 backdrop-blur-sm transition-[max-height] overflow-hidden ${
           open ? "max-h-96" : "max-h-0"
         }`}
       >
-        <div className="container-xxl py-3">
+        {/* keep container consistent */}
+        <div className="container py-3">
           <ul className="flex flex-col gap-3">
             {nav.map((n) => (
               <li key={n.label}>
