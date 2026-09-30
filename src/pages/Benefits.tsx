@@ -52,7 +52,7 @@ export default function Benefits() {
       <section className="bg-white">
         <div className="container py-12">
           <div>
-            <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[var(--color-accent)]">
+            {/* <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[var(--color-accent)]">
               Core Benefits
             </p>
             <h2 className="mt-2 text-[var(--color-black)]">
@@ -61,7 +61,7 @@ export default function Benefits() {
             <p className="mt-2 max-w-2xl">
               Membership brings strategic networking advantages and reduces
               operational risks—while expanding your business footprint globally.
-            </p>
+            </p> */}
           </div>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

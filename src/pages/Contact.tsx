@@ -35,8 +35,8 @@ export default function Contact() {
     };
   }, []);
 
-  const phones = useMemo(() => data?.global_contact?.phones ?? [], [data]);
-  const emails = useMemo(() => data?.global_contact?.emails ?? [], [data]);
+  // const phones = useMemo(() => data?.global_contact?.phones ?? [], [data]);
+  // const emails = useMemo(() => data?.global_contact?.emails ?? [], [data]);
 
   const offices: OfficeUI[] = useMemo(() => {
     const list = data?.offices ?? [];
@@ -74,7 +74,7 @@ export default function Contact() {
         <div className="container py-14">
           <h1 className="text-[var(--color-black)]">Contact GLS Alliance</h1>
           <p className="mt-3">
-            Reach our team via phone or email. Offices and contact points listed below.
+            {/* Reach our team via phone or email. Offices and contact points listed below. */}
           </p>
 
           {/* Optional: Who we are / Vision / Mission */}
@@ -149,7 +149,7 @@ export default function Contact() {
               </div>
 
               {/* Right: Contact methods */}
-              <aside className="space-y-6">
+              {/* <aside className="space-y-6">
                 <Card>
                   <h3 className="text-[var(--color-black)] font-medium mb-4">Phone</h3>
                   {phones.length === 0 ? (
@@ -229,7 +229,7 @@ export default function Contact() {
                     )}
                   </div>
                 </Card>
-              </aside>
+              </aside> */}
             </div>
           )}
         </div>

@@ -129,7 +129,7 @@ export default function About() {
         <div className="container py-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <h2 className="text-[var(--color-black)]">Join the Directory</h2>
-            <p className="mt-2">List your company and get discovered worldwide.</p>
+            <p className="mt-2">Get discovered globally.</p>
           </div>
           <div className="flex gap-3">
             <a href="/member-registration" className="btn-accent">

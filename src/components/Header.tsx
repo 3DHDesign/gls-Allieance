@@ -13,6 +13,7 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     onScroll();
+
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -27,67 +28,59 @@ export default function Header() {
     { label: "Events", href: "/events" },
   ];
 
-  const headerBg = scrolled
-    ? "bg-white/95 backdrop-blur shadow-sm"
-    : "bg-black/30 backdrop-blur-sm";
-
-  // const brandColor = scrolled
-  //   ? "text-[var(--color-muted)]"
-  //   : "text-[var(--color-primary)]";
-
-  const linkColor = scrolled
-    ? "text-[var(--color-muted)] hover:text-[var(--color-accent)]"
-    : "text-[var(--color-primary)] hover:text-[var(--color-accent)]";
-
-  const burgerBar = scrolled
-    ? "bg-[var(--color-muted)]"
-    : "bg-[var(--color-primary)]";
-
   const onLogout = async () => {
     await logout();
     navTo("/login");
   };
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition ${headerBg}`}>
+    <header
+      className={`fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur transition-all duration-300 ${
+        scrolled ? "shadow-md" : "shadow-sm"
+      }`}
+    >
       <div className="container flex items-center justify-between py-4">
-      <a href="/" className="text-2xl font-semibold tracking-wide">
-      <span style={{ fontFamily: "Broadway", color: "#001D57" }}>G</span>
-  <span style={{ fontFamily: "Broadway", color: "#007A00" }}>L</span>
- 
-  <span style={{ fontFamily: "Broadway", color: "#06328C" }}>S</span>{" "}
-  <span className="font-bold" style={{ color: "#001D57" }}>
-    Alliance
-  </span>
-</a>
+        {/* Logo */}
+        <a href="/" className="text-2xl font-semibold tracking-wide">
+          <span style={{ fontFamily: "Broadway", color: "#001D57" }}>G</span>
+          <span style={{ fontFamily: "Broadway", color: "#007A00" }}>L</span>
+          <span style={{ fontFamily: "Broadway", color: "#06328C" }}>S</span>{" "}
+          <span className="font-bold" style={{ color: "#001D57" }}>
+            Alliance
+          </span>
+        </a>
 
-        {/* ✅ show burger until 1024px */}
+        {/* Mobile menu button */}
         <button
           aria-label="Toggle menu"
           className="lg:hidden relative h-8 w-9"
           onClick={() => setOpen((s) => !s)}
         >
           <span
-            className={`absolute left-0 top-2 block h-[2px] w-full ${burgerBar} transition ${
+            className={`absolute left-0 top-2 block h-[2px] w-full bg-[var(--color-muted)] transition ${
               open ? "translate-y-2 rotate-45" : ""
             }`}
           />
           <span
-            className={`absolute left-0 top-4 block h-[2px] w-full ${burgerBar} transition ${
+            className={`absolute left-0 top-4 block h-[2px] w-full bg-[var(--color-muted)] transition ${
               open ? "opacity-0" : ""
             }`}
           />
           <span
-            className={`absolute left-0 top-6 block h-[2px] w-full ${burgerBar} transition ${
+            className={`absolute left-0 top-6 block h-[2px] w-full bg-[var(--color-muted)] transition ${
               open ? "-translate-y-2 -rotate-45" : ""
             }`}
           />
         </button>
 
-        {/* ✅ desktop nav starts from 1024px */}
+        {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-8">
           {nav.map((n) => (
-            <a key={n.label} href={n.href} className={`${linkColor} transition-colors`}>
+            <a
+              key={n.label}
+              href={n.href}
+              className="text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
+            >
               {n.label}
             </a>
           ))}
@@ -96,22 +89,14 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <a
                 href="/login"
-                className={`inline-block rounded-full px-5 py-2 font-medium transition ${
-                  scrolled
-                    ? "bg-gray-200 text-[var(--color-muted)] hover:bg-gray-300"
-                    : "bg-white/70 text-[var(--color-muted)]"
-                }`}
+                className="inline-block rounded-full bg-gray-100 px-5 py-2 font-medium text-[var(--color-muted)] transition hover:bg-gray-200"
               >
                 Login
               </a>
 
               <a
                 href="/member-registration"
-                className={`inline-block rounded-full px-5 py-2 font-medium transition ${
-                  scrolled
-                    ? "bg-[var(--color-accent)] text-white hover:opacity-90"
-                    : "bg-primary/90 text-[var(--color-muted)]"
-                }`}
+                className="inline-block rounded-full bg-[var(--color-accent)] px-5 py-2 font-medium text-white transition hover:opacity-90"
               >
                 Become a Member
               </a>
@@ -120,11 +105,7 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <a
                 href="/dashboard"
-                className={`inline-block rounded-full px-5 py-2 font-medium transition ${
-                  scrolled
-                    ? "bg-[var(--color-accent)] text-white hover:opacity-90"
-                    : "bg-primary/90 text-[var(--color-muted)]"
-                }`}
+                className="inline-block rounded-full bg-[var(--color-accent)] px-5 py-2 font-medium text-white transition hover:opacity-90"
               >
                 Dashboard
               </a>
@@ -132,11 +113,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={onLogout}
-                className={`inline-block rounded-full px-5 py-2 font-medium transition ${
-                  scrolled
-                    ? "bg-gray-200 text-[var(--color-muted)] hover:bg-gray-300"
-                    : "bg-white/70 text-[var(--color-muted)]"
-                }`}
+                className="inline-block rounded-full bg-gray-100 px-5 py-2 font-medium text-[var(--color-muted)] transition hover:bg-gray-200"
               >
                 Logout
               </button>
@@ -145,20 +122,19 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* ✅ mobile/tablet menu works up to 1024px now */}
+      {/* Mobile menu */}
       <div
-        className={`lg:hidden bg-[#030b29]/95 backdrop-blur-sm transition-[max-height] overflow-hidden ${
-          open ? "max-h-96" : "max-h-0"
+        className={`lg:hidden bg-white border-t border-gray-100 transition-[max-height] duration-300 overflow-hidden ${
+          open ? "max-h-[520px]" : "max-h-0"
         }`}
       >
-        {/* keep container consistent */}
         <div className="container py-3">
           <ul className="flex flex-col gap-3">
             {nav.map((n) => (
               <li key={n.label}>
                 <a
                   href={n.href}
-                  className="block py-2 text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors"
+                  className="block py-2 text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
                   onClick={() => setOpen(false)}
                 >
                   {n.label}
@@ -171,16 +147,17 @@ export default function Header() {
                 <li>
                   <a
                     href="/login"
-                    className="block rounded-full bg-white/70 text-center text-[var(--color-muted)] px-4 py-3 font-medium"
+                    className="block rounded-full bg-gray-100 px-4 py-3 text-center font-medium text-[var(--color-muted)]"
                     onClick={() => setOpen(false)}
                   >
                     Login
                   </a>
                 </li>
+
                 <li>
                   <a
                     href="/member-registration"
-                    className="block rounded-full bg-primary/90 text-center text-[var(--color-muted)] px-4 py-3 font-medium"
+                    className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center font-medium text-white"
                     onClick={() => setOpen(false)}
                   >
                     Become a Member
@@ -192,12 +169,13 @@ export default function Header() {
                 <li>
                   <a
                     href="/dashboard"
-                    className="block rounded-full bg-primary/90 text-center text-[var(--color-muted)] px-4 py-3 font-medium"
+                    className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center font-medium text-white"
                     onClick={() => setOpen(false)}
                   >
                     Dashboard
                   </a>
                 </li>
+
                 <li>
                   <button
                     type="button"
@@ -205,7 +183,7 @@ export default function Header() {
                       await onLogout();
                       setOpen(false);
                     }}
-                    className="w-full rounded-full bg-white/70 text-center text-[var(--color-muted)] px-4 py-3 font-medium"
+                    className="w-full rounded-full bg-gray-100 px-4 py-3 text-center font-medium text-[var(--color-muted)]"
                   >
                     Logout
                   </button>
