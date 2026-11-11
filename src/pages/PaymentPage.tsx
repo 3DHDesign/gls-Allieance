@@ -23,11 +23,19 @@ function getGatewayErrorMessage(error: string | Record<string, string[]> | undef
 }
 
 function getCountryCode(country: string) {
-  const normalized = country.trim().toLowerCase();
-  if (normalized === "sri lanka" || normalized === "lk" || normalized === "lka") {
+  const normalized = country
+    .trim()
+    .toLowerCase()
+    .replace(/\s*\([^)]*\)\s*$/, "");
+  if (
+    normalized === "sri lanka" ||
+    normalized === "sri-lanka" ||
+    normalized === "lk" ||
+    normalized === "lka"
+  ) {
     return "LKA";
   }
-  return country.trim().toUpperCase();
+  return country.trim().toUpperCase().slice(0, 3);
 }
 
 async function sha512(value: string) {
@@ -105,6 +113,16 @@ export default function PaymentPage() {
       setGatewayMessage("A complete billing address is required for online payment.");
       return;
     }
+    const postalCode = member.zip_code?.trim() || "0000";
+    if (postalCode.length > 10) {
+      setGatewayMessage("The billing postal code must be 10 characters or fewer.");
+      return;
+    }
+    const billingCountry = getCountryCode(member.country);
+    if (billingCountry.length !== 3) {
+      setGatewayMessage("The billing country must have a valid 3-character code.");
+      return;
+    }
 
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
@@ -133,8 +151,8 @@ export default function PaymentPage() {
       customerEmail: contact?.email || user?.email || "",
       billingAddressStreet: member.registered_address,
       billingAddressCity: member.city,
-      billingAddressCountry: getCountryCode(member.country),
-      billingAddressPostcodeZip: member.zip_code || "0000",
+      billingAddressCountry: billingCountry,
+      billingAddressPostcodeZip: postalCode,
       billingAddressStateProvince: member.state_province || undefined,
       billingCompanyName: member.company_name || undefined,
       amount: formattedAmount,
