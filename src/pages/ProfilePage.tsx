@@ -1,5 +1,6 @@
  // src/pages/ProfilePage.tsx
 import { useEffect, useMemo, useState } from "react";
+import { FiBriefcase, FiCalendar, FiMapPin } from "react-icons/fi";
 import DashboardShell from "../components/DashboardShell";
 import { useAuth } from "../context/AuthContext";
 import { getMemberByUserId } from "../api/member";
@@ -7,9 +8,9 @@ import type { MemberRegistration } from "../api/member";
 
 function Item({ label, value }: { label: string; value: any }) {
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
-      <div className="w-[180px] text-gray-500">{label}</div>
-      <div className="text-gray-800 font-medium break-words flex-1">
+    <div className="grid gap-1 border-b border-slate-100 pb-3 last:border-0 last:pb-0 sm:grid-cols-[170px_1fr] sm:gap-3">
+      <div className="text-xs font-medium uppercase tracking-[0.08em] text-slate-400">{label}</div>
+      <div className="break-words text-sm font-semibold text-slate-700">
         {value ?? "—"}
       </div>
     </div>
@@ -107,11 +108,34 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(1,30,79,0.05)] sm:p-6">
+      <div className="flex items-center gap-3">
+        <span className="h-2 w-2 rounded-full bg-emerald-400" />
         <h2 className="text-[16px] font-semibold text-[#0b1f3b]">{title}</h2>
       </div>
       <div className="mt-4 space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function ProfileStat({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(1,30,79,0.04)]">
+      <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-lg text-[var(--color-accent)]">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+        <p className="mt-1 truncate text-sm font-semibold text-slate-700">{value}</p>
+      </div>
     </div>
   );
 }
@@ -174,11 +198,25 @@ export default function ProfilePage() {
   return (
     <DashboardShell>
       <div className="max-w-[1100px]">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#0b1f3b]">Profile</h1>
-          <p className="mt-1 text-[var(--color-muted)]">
-            Full company profile details.
-          </p>
+        <div className="mb-6 flex flex-col gap-5 rounded-3xl bg-[linear-gradient(120deg,#031837,#0a3767)] p-6 text-white shadow-[0_16px_40px_rgba(1,30,79,0.15)] sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-center gap-4">
+            <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white/10 text-xl font-bold text-emerald-300">
+              {data?.company_profile_image_url ? (
+                <img src={data.company_profile_image_url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                (data?.company_name || user?.name || "GLS").slice(0, 2).toUpperCase()
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Member profile</p>
+              <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">{data?.company_name || "Your company profile"}</h1>
+              <p className="mt-1 text-sm text-white/60">{data?.profile_type || "GLS Alliance member"}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/85 sm:self-center">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            {data?.status || "Profile"}
+          </div>
         </div>
 
         {loading ? (
@@ -191,6 +229,11 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="space-y-6">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <ProfileStat icon={<FiBriefcase />} label="Company" value={data?.company_name || "—"} />
+              <ProfileStat icon={<FiMapPin />} label="Location" value={data?.country || "—"} />
+              <ProfileStat icon={<FiCalendar />} label="Established" value={data?.year_established || "—"} />
+            </div>
             {/* TOP GRID */}
             <div className="grid gap-6 lg:grid-cols-2">
               <SectionCard title="Company">
