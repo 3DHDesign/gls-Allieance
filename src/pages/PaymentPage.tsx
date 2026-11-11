@@ -113,11 +113,7 @@ export default function PaymentPage() {
       setGatewayMessage("A complete billing address is required for online payment.");
       return;
     }
-    const postalCode = member.zip_code?.trim() || "0000";
-    if (postalCode.length > 10) {
-      setGatewayMessage("The billing postal code must be 10 characters or fewer.");
-      return;
-    }
+    const postalCode = (member.zip_code?.trim() || "0000").slice(0, 10);
     const billingCountry = getCountryCode(member.country);
     if (billingCountry.length !== 3) {
       setGatewayMessage("The billing country must have a valid 3-character code.");
