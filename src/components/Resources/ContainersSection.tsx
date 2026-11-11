@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ResourceImageModal from "./ResourceImageModal";
 
 type ContainerCategory =
   | "Dry Container"
@@ -110,6 +111,7 @@ function getShortLabel(name: string): string {
 
 export const ContainersSection: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
+  const [preview, setPreview] = useState<ContainerType | null>(null);
 
   const filteredContainers =
     activeFilter === "all"
@@ -156,8 +158,8 @@ export const ContainersSection: React.FC = () => {
             className="flex gap-4 rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] p-5 md:p-6"
           >
             {/* left “image” */}
-            <div className="w-24 md:w-28 flex-shrink-0">
-              <div className="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-[#0A58FF] to-[#1b9fff] flex items-center justify-center overflow-hidden">
+            <button type="button" className="w-24 flex-shrink-0 text-left md:w-28" onClick={() => setPreview(c)} aria-label={`Expand image for ${c.name}`}>
+              <div className="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-[#0A58FF] to-[#1b9fff] flex items-center justify-center overflow-hidden transition duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-10/12 h-6/12 border-2 border-white/90 rounded-sm relative">
                   <div className="absolute inset-x-1 bottom-1 h-[2px] bg-white/60" />
                   <div className="absolute inset-y-1 left-1 w-[2px] bg-white/50" />
@@ -167,7 +169,8 @@ export const ContainersSection: React.FC = () => {
                   {getShortLabel(c.name)}
                 </span>
               </div>
-            </div>
+              <span className="mt-2 block text-center text-[10px] font-medium text-[var(--color-accent-light)]">Click to expand</span>
+            </button>
 
             {/* text block */}
             <div className="flex-1">
@@ -208,6 +211,13 @@ export const ContainersSection: React.FC = () => {
           </article>
         ))}
       </div>
+      {preview && (
+        <ResourceImageModal
+          label={preview.name}
+          code={getShortLabel(preview.name)}
+          onClose={() => setPreview(null)}
+        />
+      )}
     </div>
   );
 };

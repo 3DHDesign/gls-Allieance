@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { changePasswordAfterOtp } from "../api/auth";
+import AuthLayout from "../components/AuthLayout";
 
 export default function ResetPassword() {
   const nav = useNavigate();
@@ -51,15 +52,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb]">
-      <section className="container pt-24 pb-14">
-        <div className="mx-auto max-w-md rounded-2xl bg-white border border-gray-200 shadow p-6 md:p-7">
-          <h1 className="text-2xl font-semibold text-[var(--color-accent)]">
-            Reset Password
-          </h1>
-          <p className="mt-1 text-sm text-[var(--color-muted)]">
-            Set your new password.
-          </p>
+    <AuthLayout eyebrow="New password" title="Create a new password" description="Choose a strong password to keep your GLS Alliance account secure.">
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -73,14 +66,14 @@ export default function ResetPassword() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="mt-5 grid gap-4">
+          <form onSubmit={onSubmit} className="mt-6 grid gap-4">
             <div>
               <label className="block text-sm mb-1">New Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-3"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-[var(--color-accent-light)] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 placeholder="New password"
                 autoComplete="new-password"
               />
@@ -92,7 +85,7 @@ export default function ResetPassword() {
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-3"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-[var(--color-accent-light)] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 placeholder="Confirm new password"
                 autoComplete="new-password"
               />
@@ -101,7 +94,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-accent disabled:opacity-50"
+              className="rounded-xl bg-[var(--color-accent)] px-4 py-3.5 font-semibold text-white shadow-[0_10px_24px_rgba(1,30,79,0.16)] disabled:opacity-50"
             >
               {loading ? "Changing..." : "Change Password"}
             </button>
@@ -115,8 +108,6 @@ export default function ResetPassword() {
               </a>
             </div>
           </form>
-        </div>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }

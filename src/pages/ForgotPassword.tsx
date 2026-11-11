@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { requestPasswordOtp } from "../api/auth"; 
+import AuthLayout from "../components/AuthLayout";
 
 
 export default function ForgotPassword() {
@@ -40,15 +41,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb]">
-      <section className="container pt-24 pb-14">
-        <div className="mx-auto max-w-md rounded-2xl bg-white border border-gray-200 shadow p-6 md:p-7">
-          <h1 className="text-2xl font-semibold text-[var(--color-accent)]">
-            Forgot Password
-          </h1>
-          <p className="mt-1 text-sm text-[var(--color-muted)]">
-            Enter your registered email. We’ll send an OTP.
-          </p>
+    <AuthLayout eyebrow="Account recovery" title="Reset your password" description="Enter your registered email and we’ll send a secure one-time code.">
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -62,14 +55,14 @@ export default function ForgotPassword() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="mt-5 grid gap-4">
+          <form onSubmit={onSubmit} className="mt-6 grid gap-4">
             <div>
               <label className="block text-sm mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-3"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-[var(--color-accent-light)] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 placeholder="you@company.com"
                 autoComplete="email"
               />
@@ -78,7 +71,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-accent disabled:opacity-50"
+              className="rounded-xl bg-[var(--color-accent)] px-4 py-3.5 font-semibold text-white shadow-[0_10px_24px_rgba(1,30,79,0.16)] disabled:opacity-50"
             >
               {loading ? "Sending OTP..." : "Send OTP"}
             </button>
@@ -93,8 +86,6 @@ export default function ForgotPassword() {
               </a>
             </div>
           </form>
-        </div>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }

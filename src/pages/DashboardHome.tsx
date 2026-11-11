@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import DashboardShell from "../components/DashboardShell";
 import { getMemberByUserId } from "../api/member";
 import type { MemberRegistration } from "../api/member";
+import { FiArrowRight, FiBriefcase, FiMail, FiMapPin } from "react-icons/fi";
 
 
 function badge(status?: string) {
@@ -35,13 +36,17 @@ export default function DashboardHome() {
 
   return (
     <DashboardShell>
-      <h1 className="text-4xl font-bold text-[#0b1f3b]">Dashboard</h1>
-      <p className="mt-1 text-[var(--color-muted)]">Welcome, {name}.</p>
+      <div className="rounded-3xl bg-[linear-gradient(120deg,#031837,#0a3767)] p-6 text-white shadow-[0_16px_40px_rgba(1,30,79,0.16)] sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Member overview</p>
+        <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">Welcome back, {name}.</h1>
+        <p className="mt-2 text-sm text-white/65">Manage your GLS Alliance membership and stay connected to your network.</p>
+      </div>
 
       {loading ? (
-        <div className="mt-6 bg-white border rounded-2xl p-6">Loading...</div>
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">Loading your member summary...</div>
       ) : (
-        <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm max-w-2xl">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_10px_30px_rgba(1,30,79,0.06)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-[#0b1f3b]">Summary</h2>
             <span className={`border rounded-full px-3 py-1 text-xs font-medium capitalize ${badge(data?.status)}`}>
@@ -49,11 +54,11 @@ export default function DashboardHome() {
             </span>
           </div>
 
-          <div className="mt-4 space-y-2 text-sm text-gray-700">
-            <p><b>Email:</b> {email}</p>
-            <p><b>Profile Type:</b> {data?.profile_type || "—"}</p>
-            <p><b>Company:</b> {data?.company_name || "—"}</p>
-            <p><b>Reference Code:</b> {data?.ref_code || "—"}</p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <SummaryItem icon={<FiMail />} label="Email" value={email} />
+            <SummaryItem icon={<FiBriefcase />} label="Company" value={data?.company_name || "—"} />
+            <SummaryItem icon={<FiMapPin />} label="Profile type" value={data?.profile_type || "—"} />
+            <SummaryItem icon={<FiArrowRight />} label="Reference code" value={data?.ref_code || "—"} />
           </div>
 
           {String(data?.status).toLowerCase() === "rejected" && (
@@ -62,7 +67,28 @@ export default function DashboardHome() {
             </div>
           )}
         </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_10px_30px_rgba(1,30,79,0.06)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-light)]">Quick actions</p>
+          <h2 className="mt-2 text-xl font-semibold text-[#0b1f3b]">Keep your profile current</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">Update your company details or review your membership payment status.</p>
+          <div className="mt-5 grid gap-2">
+            <a href="/profile" className="rounded-xl bg-blue-50 px-4 py-3 text-sm font-semibold text-[var(--color-accent)] transition hover:bg-blue-100">Review profile</a>
+            <a href="/payment" className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-[var(--color-accent-light)] hover:text-[var(--color-accent)]">View payments</a>
+          </div>
+        </div>
+        </div>
       )}
     </DashboardShell>
+  );
+}
+
+function SummaryItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+        <span className="text-[var(--color-accent-light)]">{icon}</span>{label}
+      </div>
+      <p className="mt-2 truncate text-sm font-semibold text-slate-700">{value}</p>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AuthLayout from "../components/AuthLayout";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -41,15 +42,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb]">
-      <section className="container pt-24 pb-14">
-        <div className="mx-auto max-w-md rounded-2xl bg-white border border-gray-200 shadow p-6 md:p-7">
-          <h1 className="text-2xl font-semibold text-[var(--color-accent)]">
-            Login
-          </h1>
-          <p className="mt-1 text-sm text-[var(--color-muted)]">
-            Use the email + password you received.
-          </p>
+    <AuthLayout eyebrow="Welcome back" title="Sign in to your account" description="Use the email and password associated with your GLS Alliance membership.">
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -63,14 +56,14 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="mt-5 grid gap-4">
+          <form onSubmit={onSubmit} className="mt-6 grid gap-4">
             <div>
               <label className="block text-sm mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-3"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-[var(--color-accent-light)] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 placeholder="you@company.com"
                 autoComplete="email"
               />
@@ -82,19 +75,19 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-3"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 outline-none transition focus:border-[var(--color-accent-light)] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 placeholder="password"
                 autoComplete="current-password"
               />
               <div className="mt-2 text-xs text-[var(--color-muted)]">
-                Forgot password? We’ll add OTP reset next.
+                Use the secure OTP reset flow if you forgot your password.
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-accent disabled:opacity-50"
+              className="rounded-xl bg-[var(--color-accent)] px-4 py-3.5 font-semibold text-white shadow-[0_10px_24px_rgba(1,30,79,0.16)] transition hover:bg-[var(--color-accent-mid)] disabled:opacity-50"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
@@ -117,8 +110,6 @@ export default function LoginPage() {
               </a>
             </div>
           </form>
-        </div>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }
