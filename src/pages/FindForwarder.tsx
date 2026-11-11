@@ -140,14 +140,17 @@ export default function FindForwarder() {
     (lastPage ? page < lastPage : rows.length === perPage); // if lastPage unknown, infer by result size
 
   return (
-    <main className="min-h-[70vh] pb-16">
-      <section className="container pt-10 md:pt-18">
-        <h1 className="text-[28px] md:text-[42px] leading-tight font-bold text-[var(--color-accent)]">
-          Find a Freight Forwarder
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
+    <main className="min-h-[70vh] bg-[#f7f9fc] pb-16 pt-[78px]">
+      <section className="relative isolate overflow-hidden bg-[#061a35]">
+        <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero_image_01.avif')" }} />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,24,55,0.96),rgba(3,24,55,0.7),rgba(3,24,55,0.3))]" />
+        <div className="container py-14 md:py-16">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Global directory</p>
+          <h1 className="text-4xl font-semibold leading-tight text-white md:text-5xl">Find your next trusted partner</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
           Browse the latest members or use filters to refine your search.
-        </p>
+          </p>
+        </div>
       </section>
 
       <DirectoryFilters

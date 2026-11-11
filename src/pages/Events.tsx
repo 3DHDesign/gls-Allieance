@@ -103,14 +103,17 @@ export default function EventsPage() {
   };
 
   return (
-    <main className="min-h-[70vh] pb-16 bg-green-100">
-      <section className="container pt-10 md:pt-18">
-        <h1 className="text-[28px] md:text-[42px] leading-tight font-bold text-[var(--color-accent)]">
-          Events & Meetup
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
+    <main className="min-h-[70vh] bg-[#f7f9fc] pb-16 pt-[78px]">
+      <section className="relative isolate overflow-hidden bg-[#061a35]">
+        <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero_about.jpg')" }} />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,24,55,0.96),rgba(3,24,55,0.7),rgba(3,24,55,0.3))]" />
+        <div className="container py-14 md:py-16">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Connect in person</p>
+          <h1 className="text-4xl font-semibold leading-tight text-white md:text-5xl">Events &amp; Meetups</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
           Discover upcoming GLS Alliance gatherings, workshops, and expos.
-        </p>
+          </p>
+        </div>
       </section>
 
       <EventsFilter

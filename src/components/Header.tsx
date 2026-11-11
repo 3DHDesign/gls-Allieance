@@ -1,197 +1,215 @@
-// src/components/Header.tsx
 import { useEffect, useState } from "react";
+import { FiArrowRight, FiMenu, FiX } from "react-icons/fi";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+
+const nav = [
+  { label: "About GLS", href: "/about" },
+  { label: "Benefits", href: "/benefits" },
+  { label: "Directory", href: "/find-forwarder" },
+  { label: "Resources", href: "/resources" },
+  { label: "Events", href: "/events" },
+];
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   const { isAuthenticated, logout } = useAuth();
-  const navTo = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
-
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const nav = [
-    { label: "About GLS", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Resources", href: "/resources" },
-    { label: "Benefits", href: "/benefits" },
-    { label: "Membership", href: "/member-registration" },
-    { label: "Directory", href: "/find-forwarder" },
-    { label: "Events", href: "/events" },
-  ];
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const closeMenu = () => setOpen(false);
 
   const onLogout = async () => {
     await logout();
-    navTo("/login");
+    closeMenu();
+    navigate("/login");
   };
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    [
+      "relative py-2 text-[13px] font-medium tracking-wide transition-colors",
+      isActive
+        ? "text-[var(--color-accent)]"
+        : "text-slate-600 hover:text-[var(--color-accent)]",
+      "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-[var(--color-accent)] after:transition-transform",
+      isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",
+    ].join(" ");
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur transition-all duration-300 ${
-        scrolled ? "shadow-md" : "shadow-sm"
-      }`}
+      className={[
+        "fixed inset-x-0 top-0 z-50 border-b transition-all duration-300",
+        scrolled
+          ? "border-slate-200/80 bg-white/95 shadow-[0_8px_30px_rgba(1,30,79,0.08)] backdrop-blur-xl"
+          : "border-transparent bg-white",
+      ].join(" ")}
     >
-      <div className="container flex items-center justify-between py-4">
-        {/* Logo */}
-        <a href="/" className="text-2xl font-semibold tracking-wide">
-          <span style={{ fontFamily: "Broadway", color: "#001D57" }}>G</span>
-          <span style={{ fontFamily: "Broadway", color: "#007A00" }}>L</span>
-          <span style={{ fontFamily: "Broadway", color: "#06328C" }}>S</span>{" "}
-          <span className="font-bold" style={{ color: "#001D57" }}>
-            Alliance
-          </span>
-        </a>
-
-        {/* Mobile menu button */}
-        <button
-          aria-label="Toggle menu"
-          className="lg:hidden relative h-8 w-9"
-          onClick={() => setOpen((s) => !s)}
+      <div className="container flex h-[78px] items-center justify-between gap-6">
+        <Link
+          to="/"
+          className="group flex shrink-0 items-center gap-3"
+          onClick={closeMenu}
+          aria-label="GLS Alliance home"
         >
-          <span
-            className={`absolute left-0 top-2 block h-[2px] w-full bg-[var(--color-muted)] transition ${
-              open ? "translate-y-2 rotate-45" : ""
-            }`}
+          <img
+            src="/images/logo.png"
+            alt="GLS Alliance"
+            className="h-[66px] w-[142px] object-contain transition-transform group-hover:scale-[1.03] sm:w-[178px]"
           />
-          <span
-            className={`absolute left-0 top-4 block h-[2px] w-full bg-[var(--color-muted)] transition ${
-              open ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`absolute left-0 top-6 block h-[2px] w-full bg-[var(--color-muted)] transition ${
-              open ? "-translate-y-2 -rotate-45" : ""
-            }`}
-          />
-        </button>
+        </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {nav.map((n) => (
-            <a
-              key={n.label}
-              href={n.href}
-              className="text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
-            >
-              {n.label}
-            </a>
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
+          {nav.map((item) => (
+            <NavLink key={item.href} to={item.href} className={linkClass}>
+              {item.label}
+            </NavLink>
           ))}
+          <NavLink
+            to="/contact"
+            className="flex items-center gap-1 py-2 text-[13px] font-medium tracking-wide text-slate-600 transition-colors hover:text-[var(--color-accent)]"
+          >
+            Contact Us
+          </NavLink>
+        </nav>
 
+        <div className="hidden items-center gap-3 lg:flex">
           {!isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <a
-                href="/login"
-                className="inline-block rounded-full bg-gray-100 px-5 py-2 font-medium text-[var(--color-muted)] transition hover:bg-gray-200"
+            <>
+              <Link
+                to="/login"
+                className="rounded-full px-4 py-2.5 text-[13px] font-semibold text-slate-600 transition-colors hover:text-[var(--color-accent)]"
               >
-                Login
-              </a>
-
-              <a
-                href="/member-registration"
-                className="inline-block rounded-full bg-[var(--color-accent)] px-5 py-2 font-medium text-white transition hover:opacity-90"
+                Sign in
+              </Link>
+              <Link
+                to="/member-registration"
+                className="group flex items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-3 text-[13px] font-semibold text-white shadow-[0_7px_18px_rgba(1,30,79,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-accent-mid)]"
               >
-                Become a Member
-              </a>
-            </div>
+                Become a member
+                <FiArrowRight className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </>
           ) : (
-            <div className="flex items-center gap-3">
-              <a
-                href="/dashboard"
-                className="inline-block rounded-full bg-[var(--color-accent)] px-5 py-2 font-medium text-white transition hover:opacity-90"
+            <>
+              <Link
+                to="/dashboard"
+                className="rounded-full bg-[var(--color-accent)] px-5 py-3 text-[13px] font-semibold text-white shadow-[0_7px_18px_rgba(1,30,79,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-accent-mid)]"
               >
                 Dashboard
-              </a>
-
+              </Link>
               <button
                 type="button"
                 onClick={onLogout}
-                className="inline-block rounded-full bg-gray-100 px-5 py-2 font-medium text-[var(--color-muted)] transition hover:bg-gray-200"
+                className="px-2 py-2 text-[13px] font-semibold text-slate-500 transition-colors hover:text-red-600"
               >
-                Logout
+                Sign out
               </button>
-            </div>
+            </>
           )}
-        </nav>
+        </div>
+
+        <button
+          type="button"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          className="grid h-11 w-11 place-items-center rounded-xl border border-slate-200 text-xl text-[var(--color-accent)] transition-colors hover:bg-slate-50 lg:hidden"
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <FiX /> : <FiMenu />}
+        </button>
       </div>
 
-      {/* Mobile menu */}
       <div
-        className={`lg:hidden bg-white border-t border-gray-100 transition-[max-height] duration-300 overflow-hidden ${
-          open ? "max-h-[520px]" : "max-h-0"
-        }`}
+        className={[
+          "overflow-hidden border-t border-slate-100 bg-white transition-[max-height,opacity] duration-300 lg:hidden",
+          open ? "max-h-[620px] opacity-100" : "max-h-0 opacity-0",
+        ].join(" ")}
       >
-        <div className="container py-3">
-          <ul className="flex flex-col gap-3">
-            {nav.map((n) => (
-              <li key={n.label}>
-                <a
-                  href={n.href}
-                  className="block py-2 text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
-                  onClick={() => setOpen(false)}
-                >
-                  {n.label}
-                </a>
-              </li>
+        <nav className="container py-5" aria-label="Mobile navigation">
+          <div className="grid gap-1">
+            {nav.map((item) => (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-3 text-sm font-medium ${
+                    isActive
+                      ? "bg-blue-50 text-[var(--color-accent)]"
+                      : "text-slate-600 hover:bg-slate-50"
+                  }`
+                }
+                onClick={closeMenu}
+              >
+                {item.label}
+              </NavLink>
             ))}
+            <NavLink
+              to="/contact"
+              className={({ isActive }) =>
+                `rounded-xl px-4 py-3 text-sm font-medium ${
+                  isActive
+                    ? "bg-blue-50 text-[var(--color-accent)]"
+                    : "text-slate-600 hover:bg-slate-50"
+                }`
+              }
+              onClick={closeMenu}
+            >
+              Contact
+            </NavLink>
+          </div>
 
+          <div className="mt-5 grid gap-2 border-t border-slate-100 pt-5">
             {!isAuthenticated ? (
               <>
-                <li>
-                  <a
-                    href="/login"
-                    className="block rounded-full bg-gray-100 px-4 py-3 text-center font-medium text-[var(--color-muted)]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Login
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="/member-registration"
-                    className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center font-medium text-white"
-                    onClick={() => setOpen(false)}
-                  >
-                    Become a Member
-                  </a>
-                </li>
+                <Link
+                  to="/login"
+                  onClick={closeMenu}
+                  className="rounded-xl px-4 py-3 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/member-registration"
+                  onClick={closeMenu}
+                  className="rounded-xl bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-white"
+                >
+                  Become a member
+                </Link>
               </>
             ) : (
               <>
-                <li>
-                  <a
-                    href="/dashboard"
-                    className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center font-medium text-white"
-                    onClick={() => setOpen(false)}
-                  >
-                    Dashboard
-                  </a>
-                </li>
-
-                <li>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await onLogout();
-                      setOpen(false);
-                    }}
-                    className="w-full rounded-full bg-gray-100 px-4 py-3 text-center font-medium text-[var(--color-muted)]"
-                  >
-                    Logout
-                  </button>
-                </li>
+                <Link
+                  to="/dashboard"
+                  onClick={closeMenu}
+                  className="rounded-xl bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-white"
+                >
+                  Go to dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="rounded-xl px-4 py-3 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  Sign out
+                </button>
               </>
             )}
-          </ul>
-        </div>
+          </div>
+        </nav>
       </div>
     </header>
   );
