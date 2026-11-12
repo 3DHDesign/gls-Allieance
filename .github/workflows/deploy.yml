@@ -1,7 +1,7 @@
 name: "gls public"
 on:
   push:
-    branches: [dev]
+    branches: [dev-Chandana]
 
 jobs:
   Build-and-Deploy:
