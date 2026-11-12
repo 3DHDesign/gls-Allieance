@@ -267,7 +267,7 @@ export const AirFreightSection: React.FC = () => {
       : ulds.filter((u) => u.type === activeFilter);
 
   return (
-    <div className="container py-10 md:py-14">
+    <div className="container px-4 py-8 sm:px-6 sm:py-10 md:py-14">
       <header className="mb-6 md:mb-8">
         <h2>Air Freight Containers &amp; ULD Equipment</h2>
         <p className="mt-2 text-muted max-w-2xl">
@@ -299,7 +299,7 @@ export const AirFreightSection: React.FC = () => {
         </div>
       </header>
 
-      <div className="grid gap-6 lg:gap-8 md:grid-cols-2">
+      <div className="grid gap-5 lg:gap-8 md:grid-cols-2">
         {filteredUlds.map((u) => (
           <article
             key={u.id}
@@ -312,7 +312,7 @@ export const AirFreightSection: React.FC = () => {
               aria-label={`Expand image for ${u.name}`}
             >
               {/* Image Container */}
-              <div className="relative aspect-[16/7] w-full overflow-hidden bg-white">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-white sm:aspect-[16/8]">
                 <img
                   src={u.image}
                   alt={`${u.code} - ${u.name}`}
@@ -331,7 +331,7 @@ export const AirFreightSection: React.FC = () => {
               </span>
             </button>
 
-            <div className="p-5 md:p-6">
+            <div className="p-4 sm:p-5 md:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <h3 className="min-w-0 flex-1 text-[17px] font-semibold leading-snug text-[#111827] md:text-lg">
                   {u.code} – {u.name}

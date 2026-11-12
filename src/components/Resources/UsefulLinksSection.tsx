@@ -74,24 +74,24 @@ export const UsefulLinksSection: React.FC = () => {
 
   return (
     <section className="bg-[var(--color-primary)]">
-      <div className="container py-12 md:py-16">
+      <div className="container px-4 py-8 sm:px-6 sm:py-12 md:py-16">
         <header className="mb-8 md:mb-10">
-          <h2 className="text-3xl md:text-4xl font-semibold text-[#111]">
+          <h2 className="text-2xl font-semibold text-[#111] sm:text-3xl md:text-4xl">
             Useful Links
           </h2>
-          <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-muted)] sm:mt-3 sm:text-base">
             Quick access to external tools and references commonly used in day-to-day
             freight forwarding and logistics.
           </p>
         </header>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 lg:gap-6 xl:grid-cols-3">
           {groups.map((group) => (
             <div
               key={group.title}
               className="rounded-2xl border border-black/10 bg-white shadow-sm hover:shadow-md transition overflow-hidden"
             >
-              <div className="flex items-start justify-between gap-4 p-6 border-b border-black/5">
+              <div className="flex items-start justify-between gap-3 border-b border-black/5 p-4 sm:gap-4 sm:p-6">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-white/70 border border-black/10 flex items-center justify-center">
                     {group.icon}
@@ -109,7 +109,7 @@ export const UsefulLinksSection: React.FC = () => {
                 <span className="h-2 w-2 rounded-full bg-[var(--color-accent)] mt-2" />
               </div>
 
-              <ul className="p-4 md:p-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <ul className="grid grid-cols-1 gap-2 p-3 sm:grid-cols-2 sm:p-4 md:p-5">
                 {group.items.map((item) => {
                   const external = isExternal(item.href);
                   return (

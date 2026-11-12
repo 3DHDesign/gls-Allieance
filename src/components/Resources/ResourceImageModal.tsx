@@ -26,7 +26,7 @@ export default function ResourceImageModal({ label, code, imageUrl, onClose }: P
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl"
+        className="relative max-h-[calc(100vh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/20 bg-white shadow-2xl sm:rounded-3xl"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -38,19 +38,19 @@ export default function ResourceImageModal({ label, code, imageUrl, onClose }: P
           <FiX />
         </button>
 
-        <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden bg-slate-100">
+        <div className="relative flex h-[min(58vh,420px)] min-h-[220px] items-center justify-center overflow-hidden bg-slate-100 sm:h-[min(70vh,520px)]">
           <img
             src={imageUrl}
             alt={label}
-            className="max-h-[70vh] w-full object-contain"
+            className="max-h-full w-full object-contain"
           />
 
-          <span className="absolute bottom-5 left-6 rounded-full bg-black/65 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+          <span className="absolute bottom-3 left-3 rounded-full bg-black/65 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm sm:bottom-5 sm:left-6 sm:text-xs sm:tracking-[0.16em]">
             <FiZoomIn className="mr-1 inline" /> {code} Preview
           </span>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-light)]">
             Resource visual
           </p>

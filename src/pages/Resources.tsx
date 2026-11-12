@@ -15,10 +15,14 @@ const Resources: React.FC = () => {
       <section className="relative isolate overflow-hidden bg-[#061a35]">
         <div className="absolute inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero_image_01.avif')" }} />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,24,55,0.96),rgba(3,24,55,0.72),rgba(3,24,55,0.35))]" />
-        <div className="container py-14 md:py-16">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">Knowledge hub</p>
-          <h1 className="text-4xl font-semibold leading-tight text-white md:text-5xl">Resources &amp; Equipment Guide</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
+        <div className="container px-4 py-10 sm:px-6 sm:py-14 md:py-16">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300 sm:mb-4 sm:text-xs sm:tracking-[0.24em]">
+            Knowledge hub
+          </p>
+          <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-4xl md:text-5xl">
+            Resources &amp; Equipment Guide
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:mt-4 sm:text-base sm:leading-7 md:text-lg">
             Single reference hub for common ocean container types, air-freight
             ULD equipment, and useful logistics tools.
           </p>
@@ -26,7 +30,7 @@ const Resources: React.FC = () => {
 
         {/* TABS */}
         <div className="border-t border-white/10 bg-black/30">
-          <div className="container py-3">
+          <div className="container overflow-x-auto px-3 py-3 sm:px-6">
             <ResourcesTabs activeTab={activeTab} onChange={setActiveTab} />
           </div>
         </div>

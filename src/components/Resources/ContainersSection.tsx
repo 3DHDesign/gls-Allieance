@@ -125,7 +125,7 @@ const containers: ContainerType[] = [
   {
     id: "20-flatrack",
     name: "20' Flatrack (22P3)",
-    image: "/images/container/erth/mmm.png",
+    image: "/images/container/erth/FLATRACK-20.png",
     category: "Flatrack",
     internal: "5,612–5,638 mm length × 2,227 mm width × 2,219–2,235 mm height (between corner posts)",
     payload: "Up to 42,100 kg (92,814 lbs) [31,260 kg / 37,060 kg / 42,100 kg series]",
@@ -162,7 +162,7 @@ export const ContainersSection: React.FC = () => {
       : containers.filter((c) => c.category === activeFilter);
 
   return (
-    <div className="container py-10 md:py-14">
+    <div className="container px-4 py-8 sm:px-6 sm:py-10 md:py-14">
       <header className="mb-6 md:mb-8">
         <h2>Ocean Container Specifications</h2>
         <p className="mt-2 text-muted max-w-2xl">
@@ -194,16 +194,16 @@ export const ContainersSection: React.FC = () => {
         </div>
       </header>
 
-      <div className="grid gap-6 lg:gap-8 md:grid-cols-2">
+      <div className="grid gap-5 lg:gap-8 xl:grid-cols-2">
         {filteredContainers.map((c) => (
           <article
             key={c.id}
-            className="flex gap-4 rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] p-5 md:p-6"
+            className="flex flex-col gap-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)] sm:p-5 md:flex-row md:gap-5 md:p-6"
           >
             {/* left “image” */}
             <button
               type="button"
-              className="w-56 flex-shrink-0 text-left md:w-56 hover:cursor-pointer"
+              className="w-full flex-shrink-0 text-left hover:cursor-pointer md:w-40 lg:w-48"
               onClick={() => setPreview(c)}
               aria-label={`Expand image for ${c.name}`}
             >
@@ -211,7 +211,8 @@ export const ContainersSection: React.FC = () => {
                 <img
                   src={c.image}
                   alt={c.name}
-                  className="w-full h-full object-cover rounded-xl"
+                  loading="lazy"
+                  className="h-full w-full rounded-xl object-cover"
                 />
 
                 <span className="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-[2px] text-[10px] font-medium text-white">
@@ -226,11 +227,11 @@ export const ContainersSection: React.FC = () => {
 
             {/* text block */}
             <div className="flex-1">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-[17px] md:text-lg font-semibold text-[#111827]">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <h3 className="min-w-0 flex-1 text-[17px] font-semibold leading-snug text-[#111827] md:text-lg">
                   {c.name}
                 </h3>
-                <span className="inline-flex items-center rounded-full border border-[#0A2542] px-3 py-0.5 text-[11px] font-medium text-[#0A2542]">
+                <span className="inline-flex shrink-0 items-center rounded-full border border-[#0A2542] px-3 py-1 text-[11px] font-medium text-[#0A2542]">
                   {c.category}
                 </span>
               </div>
