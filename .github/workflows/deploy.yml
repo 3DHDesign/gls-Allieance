@@ -49,7 +49,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: "./dist"
+          local-dir: "./dist/"
           server-dir: "/"
           timeout: 7200000
           # max-retries: 3
