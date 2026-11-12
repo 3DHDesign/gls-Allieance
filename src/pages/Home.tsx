@@ -10,8 +10,8 @@ import HowItWorks from '../components/Home/HowItWorks'
 import TestimonialSlider from '../components/Home/TestimonialSlider'
 //import LogisticsBanner from '../components/Home/LogisticsBanner'
 import DirectoryActions from '../components/Home/DirectoryActions'
-import NewsEvents from "../components/Home/NewsEvents";
-import FreightListingsSlider from "../components/Home/PopularListingsSlider";
+// import NewsEvents from "../components/Home/NewsEvents";
+// import FreightListingsSlider from "../components/Home/PopularListingsSlider";
 import LogisticsBanner from "../components/Home/LogisticsBanner";
 // import CountryFlags from '../components/Home/CountryFlags'
 
