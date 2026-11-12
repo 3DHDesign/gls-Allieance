@@ -118,7 +118,7 @@ export default function Footer() {
                     href="mailto:jeewaka@glsalliance.com"
                     className="transition hover:text-white"
                   >
-                    jeewaka@glsalliance.com
+                    admin@glsalliance.com
                   </a>
                   <a
                     href="mailto:glsalliance@outlook.com"

@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import ResourceImageModal from "./ResourceImageModal";
 
 type ContainerCategory =
-  | "Dry Container"
-  | "High Cube"
-  | "Reefer"
-  | "Open Top"
-  | "Flat Rack";
+  | "General Purpose Container"
+  | "High Cube General Purpose"
+  | "Hardtop Container"
+  | "High Cube Hardtop"
+  | "Open Top Container"
+  | "High Cube Open Top"
+  | "Flatrack";
 
 type ContainerType = {
   id: string;
   name: string;
   category: ContainerCategory;
+  image: string;
   internal: string;
   payload: string;
   capacity: string;
@@ -20,76 +23,114 @@ type ContainerType = {
 
 const containers: ContainerType[] = [
   {
-    id: "20-dry",
-    name: "20' Dry Standard",
-    category: "Dry Container",
-    internal: "≈ 5.9 m × 2.35 m × 2.39 m",
-    payload: "≈ 28,000 kg",
-    capacity: "≈ 33 m³",
-    use: "General cargo, cartons, pallets.",
+    id: "20-gp",
+    name: "20' General Purpose Container (22G0 / 22G1)",
+    image: "/images/container/erth/GENERAL PURPOSE CONTAINER-20.png",
+    category: "General Purpose Container",
+    internal: "5,900 mm × 2,352 mm × 2,393 mm (19' 4¼\" × 7' 8⅝\" × 7' 10¼\")",
+    payload: "Up to 30,250 kg (66,690 lbs) [Steel floor] / 30,200 kg [Wooden floor]",
+    capacity: "33.2 m³ (1,172 ft³)",
+    use: "Suitable for any general cargo, hanging garments, and bulk cargo with liner bags.",
   },
   {
-    id: "40-dry",
-    name: "40' Dry Standard",
-    category: "Dry Container",
-    internal: "≈ 12.0 m × 2.35 m × 2.39 m",
-    payload: "≈ 28,500 kg",
-    capacity: "≈ 67 m³",
-    use: "High-volume general cargo.",
+    id: "40-gp",
+    name: "40' General Purpose Container (42G0 / 42G1)",
+    image: "/images/container/erth/GENERAL-PURPOSE-CONTAINER-40.png",
+    category: "General Purpose Container",
+    internal: "12,032 mm × 2,352 mm × 2,395 mm (39' 5⅝\" × 7' 8⅝\" × 7' 10¼\")",
+    payload: "Up to 28,800 kg (63,493 lbs)",
+    capacity: "67.7 m³ (2,391 ft³)",
+    use: "Suitable for any general cargo and hanging garment equipment.",
   },
   {
-    id: "40-hc",
-    name: "40' High Cube",
-    category: "High Cube",
-    internal: "≈ 12.0 m × 2.35 m × 2.69 m",
-    payload: "≈ 28,500 kg",
-    capacity: "≈ 76 m³",
-    use: "Voluminous but light cargo, tall loads.",
+    id: "40-hc-gp",
+    name: "40' High Cube General Purpose Container (45G0 / 45G1)",
+    image: "/images/container/erth/HIGH-CUBE-GENERAL-PURPOSE-CONTAINER-40.png",
+    category: "High Cube General Purpose",
+    internal: "12,032 mm × 2,352 mm × 2,700 mm (39' 5⅝\" × 7' 8⅝\" × 8' 10¼\")",
+    payload: "Up to 28,670 kg (63,206 lbs)",
+    capacity: "76.3 m³ – 76.4 m³ (2,695 – 2,698 ft³)",
+    use: "Voluminous cargo up to max. 2.70 m height and hanging garment equipment.",
   },
   {
-    id: "20-reefer",
-    name: "20' Reefer",
-    category: "Reefer",
-    internal: "≈ 5.4 m × 2.29 m × 2.27 m",
-    payload: "≈ 27,000 kg",
-    capacity: "≈ 28 m³",
-    use: "Temperature-controlled cargo.",
+    id: "45-hc-gp",
+    name: "45' High Cube General Purpose Container (L5G0 / L5G1)",
+    image: "/images/container/erth/HIGH-CUBE-GENERAL-PURPOSE-CONTAINER-45.png",
+    category: "High Cube General Purpose",
+    internal: "13,556 mm × 2,352 mm × 2,700 mm (44' 5⅝\" × 7' 8⅝\" × 8' 10¼\")",
+    payload: "Up to 27,800 kg (61,288 lbs)",
+    capacity: "86.0 m³ (3,037 ft³)",
+    use: "Extra-long voluminous cargo up to max. 2.70 m height; fitted with 40' and 45' corner castings.",
   },
   {
-    id: "40-reefer",
-    name: "40' Reefer",
-    category: "Reefer",
-    internal: "≈ 11.6 m × 2.29 m × 2.27 m",
-    payload: "≈ 29,000 kg",
-    capacity: "≈ 59 m³",
-    use: "Frozen and chilled goods.",
+    id: "20-hardtop",
+    name: "20' Hardtop Container (22U6)",
+    image: "/images/container/erth/HARDTOP-CONTAINER-20.png",
+    category: "Hardtop Container",
+    internal: "5,895 mm × 2,350 mm × 2,384 mm middle / 2,309 mm side",
+    payload: "Up to 29,650 kg (65,367 lbs)",
+    capacity: "32.1 m³ – 33.0 m³ (1,134 – 1,165 ft³)",
+    use: "Heavy, high, and over-height loads; removable steel roof (~450 kg) and swing-out door header for crane or forklift loading.",
+  },
+  {
+    id: "40-hardtop",
+    name: "40' Hardtop Container (42U6)",
+    image: "/images/container/erth/HARDTOP-CONTAINER-40.png",
+    category: "Hardtop Container",
+    internal: "12,020 mm × 2,342 mm × 2,388 mm middle / 2,313 mm side",
+    payload: "Up to 25,780 kg (56,835 lbs)",
+    capacity: "65.3 m³ – 67.2 m³ (2,306 – 2,373 ft³)",
+    use: "Long, heavy, and excessively high cargo loaded via crane through roof or forklift via door side.",
+  },
+  {
+    id: "40-hc-hardtop",
+    name: "40' High Cube Hardtop Container (45U6)",
+    image: "/images/container/erth/HIGH-CUBE-HARDTOP-CONTAINER-40.png",
+    category: "High Cube Hardtop",
+    internal: "12,032 mm × 2,352 mm × 2,695 mm middle / 2,620 mm side",
+    payload: "Up to 27,500 kg (60,627 lbs) [Steel floor] / 27,300 kg [Wooden floor]",
+    capacity: "73.9 m³ – 76.3 m³ (2,610 – 2,695 ft³)",
+    use: "Extra-tall heavy and over-height cargo with removable steel roof sections and hanging garment racks.",
   },
   {
     id: "20-open-top",
-    name: "20' Open Top",
-    category: "Open Top",
-    internal: "Similar to 20' dry internal dimensions",
-    payload: "≈ 28,000 kg",
-    capacity: "≈ 32–33 m³",
-    use: "Top loading: machinery, oversized cargo.",
+    name: "20' Open Top Container (22U1)",
+    image: "/images/container/erth/OPEN-TOP-CONTAINER-20.png",
+    category: "Open Top Container",
+    internal: "5,895 mm × 2,350 mm × 2,380 mm middle / 2,340 mm side",
+    payload: "Up to 30,200 kg (66,579 lbs) [Steel floor] / 30,050 kg [Wooden floor]",
+    capacity: "32.5 m³ – 32.7 m³ (1,148 – 1,155 ft³)",
+    use: "Over-height cargo and heavy loads loaded from top by crane or door side with removable tarpaulin.",
   },
   {
     id: "40-open-top",
-    name: "40' Open Top",
-    category: "Open Top",
-    internal: "Similar to 40' dry internal dimensions",
-    payload: "≈ 28,000 kg",
-    capacity: "≈ 65–67 m³",
-    use: "Top loading long / heavy cargo.",
+    name: "40' Open Top Container (42U1)",
+    image: "/images/container/erth/OPEN-TOP-CONTAINER-40.png",
+    category: "Open Top Container",
+    internal: "12,029 mm × 2,350 mm × 2,380 mm middle / 2,346 mm side",
+    payload: "Up to 28,500 kg (62,831 lbs) [Steel floor] / 28,450 kg [Wooden floor]",
+    capacity: "66.3 m³ – 66.5 m³ (2,341 – 2,348 ft³)",
+    use: "Long over-height and heavy cargo loaded via crane through roof or door side with swing-out header.",
   },
   {
-    id: "flat-rack",
-    name: "20' / 40' Flat Rack",
-    category: "Flat Rack",
-    internal: "Steel platform, collapsible end walls",
-    payload: "High payload tolerance",
-    capacity: "N/A (no closed cubic capacity)",
-    use: "Heavy machinery, out-of-gauge cargo.",
+    id: "40-hc-open-top",
+    name: "40' High Cube Open Top Container (45U1)",
+    image: "/images/container/erth/HIGH-CUBE-OPEN-TOP-CONTAINER-40.png",
+    category: "High Cube Open Top",
+    internal: "12,029 mm × 2,352 mm × 2,683 mm middle / 2,649 mm side",
+    payload: "28,250 kg (62,280 lbs) [Steel floor]",
+    capacity: "74.9 m³ (2,645 ft³)",
+    use: "Provides 305 mm (1') extra internal loading height and 8 m³ more capacity for tall heavy cargo.",
+  },
+  {
+    id: "20-flatrack",
+    name: "20' Flatrack (22P3)",
+    image: "/images/container/erth/mmm.png",
+    category: "Flatrack",
+    internal: "5,612–5,638 mm length × 2,227 mm width × 2,219–2,235 mm height (between corner posts)",
+    payload: "Up to 42,100 kg (92,814 lbs) [31,260 kg / 37,060 kg / 42,100 kg series]",
+    capacity: "N/A (open platform with flushfolding end walls)",
+    use: "Heavy loads and oversized cargo; spring-assisted collapsible end walls and 5,000 kg lashing devices.",
   },
 ];
 
@@ -97,11 +138,13 @@ type FilterId = "all" | ContainerCategory;
 
 const containerCategoryChips: { id: FilterId; label: string }[] = [
   { id: "all", label: "All Containers" },
-  { id: "Dry Container", label: "Dry Containers" },
-  { id: "High Cube", label: "High Cube" },
-  { id: "Reefer", label: "Reefer" },
-  { id: "Open Top", label: "Open Top" },
-  { id: "Flat Rack", label: "Flat Rack" },
+  { id: "General Purpose Container", label: "General Purpose" },
+  { id: "High Cube General Purpose", label: "High Cube General Purpose" },
+  { id: "Hardtop Container", label: "Hardtop" },
+  { id: "High Cube Hardtop", label: "High Cube Hardtop" },
+  { id: "Open Top Container", label: "Open Top" },
+  { id: "High Cube Open Top", label: "High Cube Open Top" },
+  { id: "Flatrack", label: "Flatrack" },
 ];
 
 function getShortLabel(name: string): string {
@@ -158,18 +201,27 @@ export const ContainersSection: React.FC = () => {
             className="flex gap-4 rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] p-5 md:p-6"
           >
             {/* left “image” */}
-            <button type="button" className="w-24 flex-shrink-0 text-left md:w-28" onClick={() => setPreview(c)} aria-label={`Expand image for ${c.name}`}>
-              <div className="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-[#0A58FF] to-[#1b9fff] flex items-center justify-center overflow-hidden transition duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="w-10/12 h-6/12 border-2 border-white/90 rounded-sm relative">
-                  <div className="absolute inset-x-1 bottom-1 h-[2px] bg-white/60" />
-                  <div className="absolute inset-y-1 left-1 w-[2px] bg-white/50" />
-                  <div className="absolute inset-y-1 right-1 w-[2px] bg-white/50" />
-                </div>
-                <span className="absolute bottom-1 left-1 rounded-full bg-black/45 px-2 py-[2px] text-[10px] font-medium text-primary">
+            <button
+              type="button"
+              className="w-56 flex-shrink-0 text-left md:w-56 hover:cursor-pointer"
+              onClick={() => setPreview(c)}
+              aria-label={`Expand image for ${c.name}`}
+            >
+              <div className="relative aspect-[4/3] rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden transition duration-300 hover:scale-105 hover:shadow-lg">
+                <img
+                  src={c.image}
+                  alt={c.name}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+
+                <span className="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-[2px] text-[10px] font-medium text-white">
                   {getShortLabel(c.name)}
                 </span>
               </div>
-              <span className="mt-2 block text-center text-[10px] font-medium text-[var(--color-accent-light)]">Click to expand</span>
+
+              <span className="mt-2 block text-center text-[10px] font-medium text-[var(--color-accent-light)]">
+                Click to expand
+              </span>
             </button>
 
             {/* text block */}
@@ -215,6 +267,7 @@ export const ContainersSection: React.FC = () => {
         <ResourceImageModal
           label={preview.name}
           code={getShortLabel(preview.name)}
+          imageUrl={preview.image}
           onClose={() => setPreview(null)}
         />
       )}

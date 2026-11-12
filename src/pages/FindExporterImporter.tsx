@@ -151,14 +151,36 @@ export default function FindExporterImporter() {
     (lastPage ? page < lastPage : rows.length === perPage); // if lastPage unknown
 
   return (
-    <main className="min-h-[70vh] pb-16">
-      <section className="container pt-10 md:pt-18">
-        <h1 className="text-[28px] md:text-[42px] leading-tight font-bold text-[var(--color-accent)]">
-          Find Exporter / Importer
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
-          Browse the latest members or use filters and categories to refine.
-        </p>
+    <main className="min-h-[70vh] bg-[#f7f9fc] pb-16 pt-[78px]">
+      <section className="relative isolate overflow-hidden bg-[#061a35]">
+        <div
+          className="absolute inset-0 -z-10 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero_image_01.avif')" }}
+        />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,24,55,0.96),rgba(3,24,55,0.72),rgba(3,24,55,0.32))]" />
+        <div className="container flex items-center justify-between gap-8 py-12 md:py-14">
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
+              Global trade directory
+            </p>
+            <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-white md:text-5xl">
+              Find trusted exporters and importers
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
+              Connect with verified global trade partners and discover the right
+              companies for your next shipment.
+            </p>
+          </div>
+          <div className="hidden w-56 shrink-0 rounded-2xl border border-white/20 bg-white/10 p-5 text-white shadow-2xl backdrop-blur-sm lg:block">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-300/20 text-xl text-emerald-200">
+              +
+            </div>
+            <p className="text-sm font-semibold">Built for better connections</p>
+            <p className="mt-2 text-xs leading-5 text-white/65">
+              Search by location, category, or company name.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Top Filters */}
@@ -177,16 +199,16 @@ export default function FindExporterImporter() {
       />
 
       {/* Sidebar + Results */}
-      <section className="container mt-6">
+      <section className="container mt-8">
         <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-          <div className="lg:sticky lg:top-24 h-fit">
+          <div className="h-fit lg:sticky lg:top-24">
             <ExportCategorySidebar
               selectedCategoryId={categoryId}
               onSelectCategory={(id) => setCategoryId(id)}
             />
           </div>
 
-          <div>
+          <div className="min-w-0">
             {/* ✅ Top info + pagination */}
             <div className="mb-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <div className="text-sm text-muted">
