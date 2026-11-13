@@ -194,72 +194,75 @@ export const ContainersSection: React.FC = () => {
         </div>
       </header>
 
-      <div className="grid gap-5 lg:gap-8 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:gap-8">
         {filteredContainers.map((c) => (
           <article
             key={c.id}
-            className="flex flex-col gap-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.06)] sm:p-5 md:flex-row md:gap-5 md:p-6"
+            className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_35px_rgba(15,23,42,0.1)]"
           >
-            {/* left “image” */}
             <button
               type="button"
-              className="w-full flex-shrink-0 text-left hover:cursor-pointer md:w-40 lg:w-48"
+              className="block w-full text-left"
               onClick={() => setPreview(c)}
               aria-label={`Expand image for ${c.name}`}
             >
-              <div className="relative aspect-[4/3] rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden transition duration-300 hover:scale-105 hover:shadow-lg">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-white sm:aspect-[16/8]">
                 <img
                   src={c.image}
                   alt={c.name}
                   loading="lazy"
-                  className="h-full w-full rounded-xl object-cover"
+                  className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
                 />
-
-                <span className="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-[2px] text-[10px] font-medium text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
                   {getShortLabel(c.name)}
                 </span>
               </div>
 
-              <span className="mt-2 block text-center text-[10px] font-medium text-[var(--color-accent-light)]">
+              <span className="block bg-[#f8fafc] px-4 py-2 text-center text-[10px] font-medium text-[var(--color-accent-light)]">
                 Click to expand
               </span>
             </button>
 
-            {/* text block */}
-            <div className="flex-1">
+            <div className="p-4 sm:p-5 md:p-6">
+              <span className="inline-flex shrink-0 items-center rounded-full border border-[#0A2542] px-12 py-1 text-[11px] font-medium text-[#0A2542]">
+                {c.category}
+              </span>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <h3 className="min-w-0 flex-1 text-[17px] font-semibold leading-snug text-[#111827] md:text-lg">
                   {c.name}
                 </h3>
-                <span className="inline-flex shrink-0 items-center rounded-full border border-[#0A2542] px-3 py-1 text-[11px] font-medium text-[#0A2542]">
-                  {c.category}
-                </span>
               </div>
 
-              <dl className="mt-2 space-y-1 text-[13px] md:text-sm text-[#374151]">
-                <div>
-                  <dt className="inline font-semibold text-[#111827]">
-                    Internal:
+              <dl className="mt-5 grid gap-x-5 gap-y-4 border-y border-gray-100 py-4 text-[13px] text-[#374151] md:grid-cols-2 md:text-sm">
+                <div className="min-w-0">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                    Internal dimensions
                   </dt>{" "}
-                  <dd className="inline">{c.internal}</dd>
+                  <dd className="mt-1">{c.internal}</dd>
                 </div>
-                <div>
-                  <dt className="inline font-semibold text-[#111827]">
-                    Max payload:
+                <div className="min-w-0">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                    Max payload
                   </dt>{" "}
-                  <dd className="inline">{c.payload}</dd>
+                  <dd className="mt-1">{c.payload}</dd>
                 </div>
-                <div>
-                  <dt className="inline font-semibold text-[#111827]">
-                    Capacity:
+                <div className="min-w-0">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                    Capacity
                   </dt>{" "}
-                  <dd className="inline">{c.capacity}</dd>
+                  <dd className="mt-1">{c.capacity}</dd>
                 </div>
               </dl>
 
-              <p className="mt-2 text-[13px] md:text-sm text-[#6B7280]">
-                {c.use}
-              </p>
+              <div className="mt-4 rounded-xl bg-[#f8fafc] p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0A2542]">
+                  Best for
+                </p>
+                <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280] md:text-sm">
+                  {c.use}
+                </p>
+              </div>
             </div>
           </article>
         ))}
