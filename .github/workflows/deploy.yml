@@ -24,14 +24,6 @@ jobs:
       - name: Copy .env file
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-      - name: Update .env file
-        run: |
-          sed -i "s/DB_HOST=.*/DB_HOST=127.0.0.1/" .env
-          sed -i "s/DB_PORT=.*/DB_PORT=3306/" .env
-          sed -i "s/KEY=.*/KEY=d35c0dea9dbb643929db856a95dabb15/" .env
-          sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
-          sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
-
       - name: Install NPM Dependencies
         run: npm install
 
