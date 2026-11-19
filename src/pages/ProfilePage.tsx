@@ -1,6 +1,16 @@
  // src/pages/ProfilePage.tsx
 import { useEffect, useMemo, useState } from "react";
-import { FiBriefcase, FiCalendar, FiMapPin } from "react-icons/fi";
+import {
+  FiBriefcase,
+  FiCalendar,
+  FiCheckCircle,
+  FiGlobe,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiShield,
+  FiUser,
+} from "react-icons/fi";
 import DashboardShell from "../components/DashboardShell";
 import { useAuth } from "../context/AuthContext";
 import { getMemberByUserId } from "../api/member";
@@ -108,12 +118,12 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(1,30,79,0.05)] sm:p-6">
-      <div className="flex items-center gap-3">
-        <span className="h-2 w-2 rounded-full bg-emerald-400" />
-        <h2 className="text-[16px] font-semibold text-[#0b1f3b]">{title}</h2>
+    <div className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,35,75,0.06)]">
+      <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+        <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-accent-light)]" />
+        <h2 className="text-base font-bold text-[#0b1f3b]">{title}</h2>
       </div>
-      <div className="mt-4 space-y-3">{children}</div>
+      <div className="space-y-3 p-5 sm:p-6">{children}</div>
     </div>
   );
 }
@@ -197,195 +207,232 @@ export default function ProfilePage() {
 
   return (
     <DashboardShell>
-      <div className="max-w-[1100px]">
-        <div className="mb-6 flex flex-col gap-5 rounded-3xl bg-[linear-gradient(120deg,#031837,#0a3767)] p-6 text-white shadow-[0_16px_40px_rgba(1,30,79,0.15)] sm:flex-row sm:items-center sm:justify-between sm:p-8">
-          <div className="flex items-center gap-4">
-            <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white/10 text-xl font-bold text-emerald-300">
-              {data?.company_profile_image_url ? (
-                <img src={data.company_profile_image_url} alt="" className="h-full w-full object-cover" />
-              ) : (
-                (data?.company_name || user?.name || "GLS").slice(0, 2).toUpperCase()
-              )}
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Member profile</p>
-              <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">{data?.company_name || "Your company profile"}</h1>
-              <p className="mt-1 text-sm text-white/60">{data?.profile_type || "GLS Alliance member"}</p>
-            </div>
+      <div className="py-2">
+        <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-accent-light)]">
+              Member profile
+            </p>
+            <h1 className="mt-2 text-3xl font-bold text-[#0b1f3b] sm:text-4xl">Company profile</h1>
+            <p className="mt-2 text-sm text-[var(--color-muted)]">
+              Review your business identity and registered member information.
+            </p>
           </div>
-          <div className="flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/85 sm:self-center">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          <div className="flex items-center gap-2 self-start rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 sm:self-end">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
             {data?.status || "Profile"}
           </div>
         </div>
 
         {loading ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-6">
-            Loading...
+          <div className="grid min-h-72 place-items-center rounded-[24px] border border-slate-200 bg-white text-sm text-slate-500 shadow-[0_12px_35px_rgba(15,35,75,0.06)]">
+            Loading profile...
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-red-200 bg-white p-6 text-red-700">
+          <div className="rounded-[24px] border border-red-200 bg-red-50 p-6 text-sm text-red-700">
             {error}
           </div>
         ) : (
           <div className="space-y-6">
+            <section className="relative overflow-hidden rounded-[28px] bg-[linear-gradient(120deg,#061a38,#0a3767)] p-6 text-white shadow-[0_18px_45px_rgba(7,29,66,0.20)] sm:p-8">
+              <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-400/10 blur-2xl" />
+              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-white/10 text-xl font-bold text-emerald-300">
+                    {data?.company_profile_image_url ? (
+                      <img src={data.company_profile_image_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      (data?.company_name || user?.name || "GLS").slice(0, 2).toUpperCase()
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">Verified member</p>
+                    <h2 className="mt-2 truncate text-2xl font-bold text-white sm:text-3xl">
+                      {data?.company_name || "Your company"}
+                    </h2>
+                    <p className="mt-1 text-sm text-blue-100">{data?.profile_type || "GLS Alliance member"}</p>
+                  </div>
+                </div>
+                {data?.website && (
+                  <a
+                    href={data.website.startsWith("http") ? data.website : `https://${data.website}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-fit items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+                  >
+                    <FiGlobe /> Visit website
+                  </a>
+                )}
+              </div>
+            </section>
+
             <div className="grid gap-3 sm:grid-cols-3">
               <ProfileStat icon={<FiBriefcase />} label="Company" value={data?.company_name || "—"} />
-              <ProfileStat icon={<FiMapPin />} label="Location" value={data?.country || "—"} />
+              <ProfileStat icon={<FiMapPin />} label="Location" value={[data?.city, data?.country].filter(Boolean).join(", ") || "—"} />
               <ProfileStat icon={<FiCalendar />} label="Established" value={data?.year_established || "—"} />
             </div>
-            {/* TOP GRID */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <SectionCard title="Company">
-                <Item label="Company Name" value={data?.company_name} />
-                <Item label="Trade Name" value={data?.trade_name} />
-                <Item label="Year Established" value={data?.year_established} />
-                <Item label="Website" value={data?.website} />
-                <Item label="Profile Type" value={data?.profile_type} />
-                <Item label="Reference Code" value={data?.ref_code} />
-                <Item label="Status" value={data?.status} />
 
-                <div className="pt-2">
-                  <FilePreview
-                    label="Company Profile Image / Logo"
-                    url={data?.company_profile_image_url}
-                  />
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="space-y-6">
+                <SectionCard title="Company information">
+                  <div className="grid gap-x-6 md:grid-cols-2">
+                    <Item label="Company Name" value={data?.company_name} />
+                    <Item label="Trade Name" value={data?.trade_name} />
+                    <Item label="Year Established" value={data?.year_established} />
+                    <Item label="Profile Type" value={data?.profile_type} />
+                    <Item label="Reference Code" value={data?.ref_code} />
+                    <Item label="Website" value={data?.website} />
+                  </div>
+                </SectionCard>
+
+                <SectionCard title="Business overview">
+                  <p className="text-sm leading-7 text-slate-600">
+                    {data?.company_profile_overview || "No company overview has been provided."}
+                  </p>
+                </SectionCard>
+
+                <SectionCard title="Registered address">
+                  <div className="grid gap-x-6 md:grid-cols-2">
+                    <Item label="Address" value={data?.registered_address} />
+                    <Item label="Country" value={data?.country} />
+                    <Item label="State / Province" value={data?.state_province} />
+                    <Item label="City" value={data?.city} />
+                    <Item label="Postal Code" value={data?.zip_code} />
+                  </div>
+                  <div className="mt-5 border-t border-slate-100 pt-5">
+                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Mailing address</p>
+                    <div className="grid gap-x-6 md:grid-cols-2">
+                      <Item label="Title" value={data?.mailing_title} />
+                      <Item label="Country" value={data?.mailing_country} />
+                      <Item label="State" value={data?.mailing_state} />
+                      <Item label="City" value={data?.mailing_city} />
+                      <Item label="Zip" value={data?.mailing_zip} />
+                    </div>
+                  </div>
+                </SectionCard>
+              </div>
+
+              <aside className="space-y-6">
+                <SectionCard title="Primary contact">
+                  <div className="mb-5 flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
+                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-[var(--color-accent)]">
+                      <FiUser />
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-[#0b1f3b]">{contact?.full_name || "—"}</p>
+                      <p className="mt-1 text-xs text-slate-500">{contact?.designation || "Primary contact"}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {contact?.email && (
+                      <a href={`mailto:${contact.email}`} className="flex items-center gap-3 text-sm text-slate-600 hover:text-[var(--color-accent)]">
+                        <FiMail className="text-[var(--color-accent)]" /> {contact.email}
+                      </a>
+                    )}
+                    {contact?.phone && (
+                      <a href={`tel:${contact.phone}`} className="flex items-center gap-3 text-sm text-slate-600 hover:text-[var(--color-accent)]">
+                        <FiPhone className="text-[var(--color-accent)]" /> {contact.phone}
+                      </a>
+                    )}
+                    <Item label="Alternate Phone" value={contact?.alternate_phone} />
+                  </div>
+                </SectionCard>
+
+                <SectionCard title="Compliance">
+                  <div className="space-y-3">
+                    {[
+                      ["Financial Protection", !!data?.financial_protection_required],
+                      ["Netting Agreement", !!data?.netting_required],
+                    ].map(([label, enabled]) => (
+                      <div key={String(label)} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                        <span className="text-xs font-semibold text-slate-600">{label}</span>
+                        <span className={`flex items-center gap-1 text-xs font-bold ${enabled ? "text-emerald-700" : "text-slate-400"}`}>
+                          <FiCheckCircle /> {enabled ? "Enabled" : "Not set"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </SectionCard>
+              </aside>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <SectionCard title="Trade & operations">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Main categories</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-700">
+                    {(data?.export_main_category_ids || []).join(", ") || "Not provided"}
+                  </p>
                 </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Subcategories</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-700">
+                    {(data?.export_subcategories || []).join(", ") || "Not provided"}
+                  </p>
+                </div>
+                <Item label="Supported Countries" value={data?.supported_countries} />
               </SectionCard>
 
-              <SectionCard title="Address">
-                <Item label="Registered Address" value={data?.registered_address} />
-                <Item label="Country" value={data?.country} />
-                <Item label="State/Province" value={data?.state_province} />
-                <Item label="City" value={data?.city} />
-                <Item label="Zip Code" value={data?.zip_code} />
-
-                <div className="pt-3">
-                  <h3 className="text-sm font-semibold text-[#0b1f3b]">
-                    Mailing Address
-                  </h3>
-                  <div className="mt-3 space-y-3">
-                    <Item label="Title" value={data?.mailing_title} />
-                    <Item label="Country" value={data?.mailing_country} />
-                    <Item label="State" value={data?.mailing_state} />
-                    <Item label="City" value={data?.mailing_city} />
-                    <Item label="Zip" value={data?.mailing_zip} />
-                  </div>
+              <SectionCard title="Network & activities">
+                <Item
+                  label="Core Activities"
+                  value={(data?.core_activities || []).join(", ") || "—"}
+                />
+                <Item
+                  label="Branch Countries"
+                  value={(data?.branches_countries || []).join(", ") || "—"}
+                />
+                <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  <FiShield />
+                  <span className="font-semibold">Membership profile information</span>
                 </div>
               </SectionCard>
             </div>
 
-            {/* SECOND GRID */}
             <div className="grid gap-6 lg:grid-cols-2">
-              <SectionCard title="Contact">
-                <Item label="Full Name" value={contact?.full_name} />
-                <Item label="Designation" value={contact?.designation} />
-                <Item label="Email" value={contact?.email} />
-                <Item label="Phone" value={contact?.phone} />
-                <Item label="Alt Phone" value={contact?.alternate_phone} />
-
-                <div className="pt-3">
-                  <h3 className="text-sm font-semibold text-[#0b1f3b]">Flags</h3>
-                  <div className="mt-3 space-y-3">
-                    <Item
-                      label="Financial Protection Required"
-                      value={String(!!data?.financial_protection_required)}
-                    />
-                    <Item
-                      label="Netting Required"
-                      value={String(!!data?.netting_required)}
-                    />
-                  </div>
+              <SectionCard title="BRC registration">
+                <div className="grid gap-x-6 md:grid-cols-2">
+                  <Item label="BRC Number" value={data?.brc_number} />
+                  <Item label="Issue Date" value={formatDate(data?.brc_issue_date)} />
+                  <Item label="Expiry Date" value={formatDate(data?.brc_expiry_date)} />
                 </div>
+                <FilePreview label="BRC Document" url={data?.brc_document_url} />
               </SectionCard>
 
-              <SectionCard title="BRC & Insurance">
-                <Item label="BRC Number" value={data?.brc_number} />
-                <Item label="BRC Issue Date" value={formatDate(data?.brc_issue_date)} />
-                <Item label="BRC Expiry Date" value={formatDate(data?.brc_expiry_date)} />
-
-                <div className="pt-2">
-                  <FilePreview label="BRC Document" url={data?.brc_document_url} />
-                </div>
-
-                <div className="pt-4 space-y-3">
-                  <Item label="Insurance Provider" value={data?.insurance_provider} />
+              <SectionCard title="Insurance">
+                <div className="grid gap-x-6 md:grid-cols-2">
+                  <Item label="Provider" value={data?.insurance_provider} />
                   <Item label="Policy Type" value={data?.policy_type} />
                   <Item label="Policy Number" value={data?.policy_number} />
                   <Item label="Coverage Amount" value={data?.coverage_amount} />
-                  <Item
-                    label="Insurance Expiry Date"
-                    value={formatDate(data?.insurance_expiry_date)}
-                  />
+                  <Item label="Expiry Date" value={formatDate(data?.insurance_expiry_date)} />
                 </div>
-
-                <div className="pt-2">
-                  <FilePreview
-                    label="Insurance Policy Document"
-                    url={data?.insurance_policy_document_url}
-                  />
-                </div>
+                <FilePreview
+                  label="Insurance Policy Document"
+                  url={data?.insurance_policy_document_url}
+                />
               </SectionCard>
             </div>
 
-            {/* OVERVIEW */}
-            <SectionCard title="Overview">
-              <div className="text-sm text-gray-700 leading-6">
-                {data?.company_profile_overview || "—"}
-              </div>
-            </SectionCard>
-
-            {/* CATEGORIES / OPERATIONS */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <SectionCard title="Categories">
-                <div className="text-sm text-gray-700">
-                  <b>Main:</b>{" "}
-                  {(data?.export_main_category_ids || []).join(", ") || "—"}
-                </div>
-                <div className="text-sm text-gray-700">
-                  <b>Sub:</b> {(data?.export_subcategories || []).join(", ") || "—"}
-                </div>
-              </SectionCard>
-
-              <SectionCard title="Operations">
-                <div className="text-sm text-gray-700">
-                  <b>Core Activities:</b>{" "}
-                  {(data?.core_activities || []).join(", ") || "—"}
-                </div>
-                <div className="text-sm text-gray-700">
-                  <b>Branches Countries:</b>{" "}
-                  {(data?.branches_countries || []).join(", ") || "—"}
-                </div>
-                <div className="text-sm text-gray-700">
-                  <b>Supported Countries:</b> {data?.supported_countries || "—"}
-                </div>
-              </SectionCard>
-            </div>
-
-            {/* AFFILIATIONS */}
             <SectionCard title="Affiliations">
               {data?.affiliations?.length ? (
-                <div className="grid gap-3">
-                  {data.affiliations.map((a, idx) => (
+                <div className="grid gap-3 md:grid-cols-2">
+                  {data.affiliations.map((affiliation, index) => (
                     <div
-                      key={idx}
-                      className="rounded-xl border border-gray-200 bg-[#f7f8fb] p-4"
+                      key={`${affiliation.name}-${index}`}
+                      className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
                     >
-                      <div className="text-sm font-semibold text-gray-800">
-                        {a.name}
-                      </div>
-                      <div className="mt-1 text-sm text-gray-600">
-                        {a.country ? `Country: ${a.country}` : "Country: —"}
-                      </div>
-                      <div className="mt-1 text-sm text-gray-600">
-                        {a.issue_date ? `Issue: ${a.issue_date}` : "Issue: —"} |{" "}
-                        {a.expiry_date ? `Expiry: ${a.expiry_date}` : "Expiry: —"}
+                      <p className="text-sm font-bold text-[#0b1f3b]">{affiliation.name}</p>
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                        {affiliation.country && <span>{affiliation.country}</span>}
+                        {affiliation.issue_date && <span>Issued {affiliation.issue_date}</span>}
+                        {affiliation.expiry_date && <span>Expires {affiliation.expiry_date}</span>}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-sm text-gray-700">—</div>
+                <p className="text-sm text-slate-500">No affiliations have been provided.</p>
               )}
             </SectionCard>
           </div>
