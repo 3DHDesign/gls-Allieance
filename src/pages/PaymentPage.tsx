@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import DashboardShell from "../components/DashboardShell";
-import { makePayment } from "../api/payment";
+import { getUserPayments, makePayment, type UserPayment } from "../api/payment";
 import { getMemberByUserId, type MemberRegistration } from "../api/member";
 import { payablePayment, type PayablePaymentDetails } from "payable-ipg-js";
-import { getActivePackages, type MembershipPackage } from "../api/package";
+import {
+  getActivePackages,
+  getUserSubscription,
+  type MembershipPackage,
+  type UserSubscription,
+} from "../api/package";
 
 function getErrorMessage(error: unknown) {
   if (typeof error === "object" && error !== null && "response" in error) {
@@ -50,6 +55,17 @@ async function sha512(value: string) {
     .toUpperCase();
 }
 
+function formatDate(value: string | null | undefined) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function PaymentPage() {
   const { user } = useAuth();
   const userId = user?.id;
@@ -65,6 +81,12 @@ export default function PaymentPage() {
   const [manualLoading, setManualLoading] = useState(false);
   const [packages, setPackages] = useState<MembershipPackage[]>([]);
   const [selectedPackageId, setSelectedPackageId] = useState<number | "">("");
+  const [packageLoading, setPackageLoading] = useState(true);
+  const [packageMessage, setPackageMessage] = useState<string | null>(null);
+  const [payments, setPayments] = useState<UserPayment[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"online" | "manual">("online");
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -81,9 +103,34 @@ export default function PaymentPage() {
           setSelectedPackageId(items[0].id);
           setAmount(String(items[0].price));
         }
+        if (items.length === 0) {
+          setPackageMessage("No active packages are available.");
+        }
       })
-      .catch((error: unknown) => setGatewayMessage(getErrorMessage(error)));
+      .catch((error: unknown) => setPackageMessage(getErrorMessage(error)))
+      .finally(() => setPackageLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+    setPaymentsLoading(true);
+    getUserPayments(userId)
+      .then(setPayments)
+      .catch((error: unknown) => setManualMessage(getErrorMessage(error)))
+      .finally(() => setPaymentsLoading(false));
+
+    getUserSubscription(userId)
+      .then(setSubscription)
+      .catch(() => setSubscription(null));
+  }, [userId]);
+
+  const refreshPayments = () => {
+    if (!userId) return;
+    getUserPayments(userId)
+      .then(setPayments)
+      .catch((error: unknown) => setManualMessage(getErrorMessage(error)));
+    getUserSubscription(userId).then(setSubscription).catch(() => setSubscription(null));
+  };
 
   const contact = member?.contacts?.[0];
   const customerName = useMemo(() => {
@@ -223,6 +270,7 @@ export default function PaymentPage() {
       setManualMessage(res?.message || "Payment submitted.");
       setSlip(null);
       setTransactionId("");
+      refreshPayments();
     } catch (error: unknown) {
       setManualMessage(getErrorMessage(error));
     } finally {
@@ -237,6 +285,18 @@ export default function PaymentPage() {
           Payment
         </h1>
         <p className="mt-1 text-muted">Pay securely by card or submit a manual payment slip.</p>
+
+        {packageLoading && (
+          <div className="mt-6 rounded-xl border bg-white px-4 py-3 text-sm text-muted">
+            Loading membership packages...
+          </div>
+        )}
+
+        {!packageLoading && packageMessage && (
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {packageMessage}
+          </div>
+        )}
 
         {packages.length > 0 && (
           <div className="mt-6">
@@ -286,84 +346,198 @@ export default function PaymentPage() {
           </div>
         )}
 
-        <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm max-w-xl">
-          <h2 className="text-xl font-semibold text-[#0b1f3b]">Pay online</h2>
-          <p className="mt-1 text-sm text-muted">
-            Visa, Mastercard, Amex, Diners and Discover are supported.
-          </p>
-          <div className="mt-4">
-            <label className="block text-sm mb-1">Amount (LKR)</label>
-            <input
-              className="w-full rounded-xl border px-3 py-3"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              inputMode="decimal"
-            />
-          </div>
-          {gatewayMessage && (
-            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {gatewayMessage}
-            </div>
-          )}
-          <button
-            type="button"
-            className="btn-accent mt-4 disabled:opacity-50"
-            disabled={gatewayLoading}
-            onClick={startGatewayPayment}
-          >
-            {gatewayLoading ? "Connecting to PAYable..." : "Pay securely"}
-          </button>
-        </div>
-
-        <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm max-w-xl">
-          <h2 className="text-xl font-semibold text-[#0b1f3b]">Manual payment</h2>
-          <p className="mt-1 text-sm text-muted">Upload slip for admin verification.</p>
-          <form onSubmit={submit} className="space-y-4">
-            <div>
-              <label className="block text-sm mb-1">Amount</label>
-              <input
-                className="w-full rounded-xl border px-3 py-3"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                inputMode="numeric"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1">Transaction ID</label>
-              <input
-                className="w-full rounded-xl border px-3 py-3"
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-                placeholder="Enter transaction ID"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1">Slip Upload (PNG/JPG/PDF)</label>
-              <input
-                type="file"
-                accept="image/*,application/pdf"
-                className="w-full rounded-xl border px-3 py-3"
-                onChange={(e) => setSlip(e.target.files?.[0] || null)}
-              />
-              {slip && (
-                <div className="mt-2 text-xs text-muted">
-                  Selected: {slip.name}
-                </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Active package</p>
+              <p className="mt-2 text-xl font-bold text-[#0b1f3b]">
+                {subscription?.status === "active" ? subscription.package?.name || "Membership" : "No active package"}
+              </p>
+              {subscription?.status === "active" && subscription.package?.billing_cycle && (
+                <p className="mt-1 text-sm capitalize text-green-800">
+                  {subscription.package.billing_cycle} membership
+                </p>
               )}
             </div>
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Expiry date</p>
+              <p className="mt-2 text-xl font-bold text-[#0b1f3b]">
+                {subscription?.status === "active" ? formatDate(subscription.expiration_date) : "-"}
+              </p>
+              {subscription?.status === "active" && (
+                <p className="mt-1 text-sm text-blue-800">Subscription renewal date</p>
+              )}
+            </div>
+        </div>
 
-            {manualMessage && (
-              <div className="rounded-xl border bg-slate-50 px-4 py-3 text-sm">
-                {manualMessage}
+        <div className="mt-6 max-w-2xl rounded-2xl border bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-[#0b1f3b]">Make a payment</h2>
+          <p className="mt-1 text-sm text-muted">Choose how you want to pay.</p>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="payment-method">
+              Payment method
+            </label>
+            <select
+              id="payment-method"
+              className="w-full rounded-xl border px-3 py-3"
+              value={paymentMethod}
+              onChange={(event) =>
+                setPaymentMethod(event.target.value as "online" | "manual")
+              }
+            >
+              <option value="online">Pay online</option>
+              <option value="manual">Manual payment</option>
+            </select>
+          </div>
+
+          {paymentMethod === "online" ? (
+            <div className="mt-5 border-t pt-5">
+              <p className="text-sm text-muted">
+                Visa, Mastercard, Amex, Diners and Discover are supported.
+              </p>
+              <div className="mt-4">
+                <label className="block text-sm mb-1">Amount (LKR)</label>
+                <input
+                  className="w-full rounded-xl border px-3 py-3"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  inputMode="decimal"
+                />
               </div>
-            )}
+              {gatewayMessage && (
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {gatewayMessage}
+                </div>
+              )}
+              <button
+                type="button"
+                className="btn-accent mt-4 disabled:opacity-50"
+                disabled={gatewayLoading}
+                onClick={startGatewayPayment}
+              >
+                {gatewayLoading ? "Connecting to PAYable..." : "Pay securely"}
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={submit} className="mt-5 space-y-4 border-t pt-5">
+              <p className="text-sm text-muted">Upload your payment slip for admin verification.</p>
+              <div>
+                <label className="block text-sm mb-1">Amount (LKR)</label>
+                <input
+                  className="w-full rounded-xl border px-3 py-3"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  inputMode="numeric"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Transaction ID</label>
+                <input
+                  className="w-full rounded-xl border px-3 py-3"
+                  value={transactionId}
+                  onChange={(e) => setTransactionId(e.target.value)}
+                  placeholder="Enter transaction ID"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Slip Upload (PNG/JPG/PDF)</label>
+                <input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="w-full rounded-xl border px-3 py-3"
+                  onChange={(e) => setSlip(e.target.files?.[0] || null)}
+                />
+                {slip && (
+                  <div className="mt-2 text-xs text-muted">Selected: {slip.name}</div>
+                )}
+              </div>
+              {manualMessage && (
+                <div className="rounded-xl border bg-slate-50 px-4 py-3 text-sm">
+                  {manualMessage}
+                </div>
+              )}
+              <button className="btn-accent disabled:opacity-50" disabled={manualLoading}>
+                {manualLoading ? "Submitting..." : "Submit Payment"}
+              </button>
+            </form>
+          )}
+        </div>
 
-            <button className="btn-accent disabled:opacity-50" disabled={manualLoading}>
-              {manualLoading ? "Submitting..." : "Submit Payment"}
+        <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-[#0b1f3b]">Payment history</h2>
+              <p className="mt-1 text-sm text-muted">View submitted payments and their verification status.</p>
+            </div>
+            <button
+              type="button"
+              className="rounded-lg border px-3 py-2 text-sm font-semibold"
+              onClick={refreshPayments}
+              disabled={paymentsLoading}
+            >
+              {paymentsLoading ? "Refreshing..." : "Refresh"}
             </button>
-          </form>
+          </div>
+
+          {paymentsLoading && payments.length === 0 ? (
+            <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-muted">
+              Loading payments...
+            </div>
+          ) : payments.length === 0 ? (
+            <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-muted">
+              No payments submitted yet.
+            </div>
+          ) : (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b text-xs uppercase text-muted">
+                    <th className="px-3 py-3">Reference</th>
+                    <th className="px-3 py-3">Package</th>
+                    <th className="px-3 py-3">Amount</th>
+                    <th className="px-3 py-3">Method</th>
+                    <th className="px-3 py-3">Status</th>
+                    <th className="px-3 py-3">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((payment) => (
+                    <tr key={payment.id} className="border-b last:border-0">
+                      <td className="px-3 py-4 font-semibold">{payment.reference_code}</td>
+                      <td className="px-3 py-4">
+                        {payment.package?.name || "Membership package"}
+                        {payment.package?.billing_cycle && (
+                          <div className="text-xs capitalize text-muted">
+                            {payment.package.billing_cycle}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-3 py-4">
+                        LKR {Number(payment.amount).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-4 capitalize">{payment.payment_type}</td>
+                      <td className="px-3 py-4">
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                            payment.status === "completed"
+                              ? "bg-green-100 text-green-700"
+                              : payment.status === "failed"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4 whitespace-nowrap">
+                        {payment.created_at_human || "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </DashboardShell>
