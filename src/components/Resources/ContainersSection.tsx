@@ -15,6 +15,7 @@ type ContainerType = {
   name: string;
   category: ContainerCategory;
   image: string;
+  detailImage: string; // Second image for "More Details"
   internal: string;
   payload: string;
   capacity: string;
@@ -26,6 +27,7 @@ const containers: ContainerType[] = [
     id: "20-gp",
     name: "20' General Purpose Container (22G0 / 22G1)",
     image: "/images/container/erth/GENERAL PURPOSE CONTAINER-20.png",
+    detailImage: "/images/container/erth/details/1.png",
     category: "General Purpose Container",
     internal: "5,900 mm × 2,352 mm × 2,393 mm (19' 4¼\" × 7' 8⅝\" × 7' 10¼\")",
     payload: "Up to 30,250 kg (66,690 lbs) [Steel floor] / 30,200 kg [Wooden floor]",
@@ -36,6 +38,7 @@ const containers: ContainerType[] = [
     id: "40-gp",
     name: "40' General Purpose Container (42G0 / 42G1)",
     image: "/images/container/erth/GENERAL-PURPOSE-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/2.png",
     category: "General Purpose Container",
     internal: "12,032 mm × 2,352 mm × 2,395 mm (39' 5⅝\" × 7' 8⅝\" × 7' 10¼\")",
     payload: "Up to 28,800 kg (63,493 lbs)",
@@ -46,6 +49,7 @@ const containers: ContainerType[] = [
     id: "40-hc-gp",
     name: "40' High Cube General Purpose Container (45G0 / 45G1)",
     image: "/images/container/erth/HIGH-CUBE-GENERAL-PURPOSE-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/3.png",
     category: "High Cube General Purpose",
     internal: "12,032 mm × 2,352 mm × 2,700 mm (39' 5⅝\" × 7' 8⅝\" × 8' 10¼\")",
     payload: "Up to 28,670 kg (63,206 lbs)",
@@ -56,6 +60,7 @@ const containers: ContainerType[] = [
     id: "45-hc-gp",
     name: "45' High Cube General Purpose Container (L5G0 / L5G1)",
     image: "/images/container/erth/HIGH-CUBE-GENERAL-PURPOSE-CONTAINER-45.png",
+    detailImage: "/images/container/erth/details/4.png",
     category: "High Cube General Purpose",
     internal: "13,556 mm × 2,352 mm × 2,700 mm (44' 5⅝\" × 7' 8⅝\" × 8' 10¼\")",
     payload: "Up to 27,800 kg (61,288 lbs)",
@@ -66,6 +71,7 @@ const containers: ContainerType[] = [
     id: "20-hardtop",
     name: "20' Hardtop Container (22U6)",
     image: "/images/container/erth/HARDTOP-CONTAINER-20.png",
+    detailImage: "/images/container/erth/details/5.png",
     category: "Hardtop Container",
     internal: "5,895 mm × 2,350 mm × 2,384 mm middle / 2,309 mm side",
     payload: "Up to 29,650 kg (65,367 lbs)",
@@ -76,6 +82,7 @@ const containers: ContainerType[] = [
     id: "40-hardtop",
     name: "40' Hardtop Container (42U6)",
     image: "/images/container/erth/HARDTOP-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/6.png",
     category: "Hardtop Container",
     internal: "12,020 mm × 2,342 mm × 2,388 mm middle / 2,313 mm side",
     payload: "Up to 25,780 kg (56,835 lbs)",
@@ -86,6 +93,7 @@ const containers: ContainerType[] = [
     id: "40-hc-hardtop",
     name: "40' High Cube Hardtop Container (45U6)",
     image: "/images/container/erth/HIGH-CUBE-HARDTOP-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/7.png",
     category: "High Cube Hardtop",
     internal: "12,032 mm × 2,352 mm × 2,695 mm middle / 2,620 mm side",
     payload: "Up to 27,500 kg (60,627 lbs) [Steel floor] / 27,300 kg [Wooden floor]",
@@ -96,6 +104,7 @@ const containers: ContainerType[] = [
     id: "20-open-top",
     name: "20' Open Top Container (22U1)",
     image: "/images/container/erth/OPEN-TOP-CONTAINER-20.png",
+    detailImage: "/images/container/erth/details/8.png",
     category: "Open Top Container",
     internal: "5,895 mm × 2,350 mm × 2,380 mm middle / 2,340 mm side",
     payload: "Up to 30,200 kg (66,579 lbs) [Steel floor] / 30,050 kg [Wooden floor]",
@@ -106,6 +115,7 @@ const containers: ContainerType[] = [
     id: "40-open-top",
     name: "40' Open Top Container (42U1)",
     image: "/images/container/erth/OPEN-TOP-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/9.png",
     category: "Open Top Container",
     internal: "12,029 mm × 2,350 mm × 2,380 mm middle / 2,346 mm side",
     payload: "Up to 28,500 kg (62,831 lbs) [Steel floor] / 28,450 kg [Wooden floor]",
@@ -116,6 +126,7 @@ const containers: ContainerType[] = [
     id: "40-hc-open-top",
     name: "40' High Cube Open Top Container (45U1)",
     image: "/images/container/erth/HIGH-CUBE-OPEN-TOP-CONTAINER-40.png",
+    detailImage: "/images/container/erth/details/10.png",
     category: "High Cube Open Top",
     internal: "12,029 mm × 2,352 mm × 2,683 mm middle / 2,649 mm side",
     payload: "28,250 kg (62,280 lbs) [Steel floor]",
@@ -126,6 +137,7 @@ const containers: ContainerType[] = [
     id: "20-flatrack",
     name: "20' Flatrack (22P3)",
     image: "/images/container/erth/FLATRACK-20.png",
+    detailImage: "/images/container/erth/details/11.png",
     category: "Flatrack",
     internal: "5,612–5,638 mm length × 2,227 mm width × 2,219–2,235 mm height (between corner posts)",
     payload: "Up to 42,100 kg (92,814 lbs) [31,260 kg / 37,060 kg / 42,100 kg series]",
@@ -152,9 +164,14 @@ function getShortLabel(name: string): string {
   return first ?? name;
 }
 
+type PreviewState = {
+  container: ContainerType;
+  type: "main" | "details";
+} | null;
+
 export const ContainersSection: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
-  const [preview, setPreview] = useState<ContainerType | null>(null);
+  const [preview, setPreview] = useState<PreviewState>(null);
 
   const filteredContainers =
     activeFilter === "all"
@@ -198,80 +215,115 @@ export const ContainersSection: React.FC = () => {
         {filteredContainers.map((c) => (
           <article
             key={c.id}
-            className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_35px_rgba(15,23,42,0.1)]"
+            className="flex flex-col justify-between group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_35px_rgba(15,23,42,0.1)]"
           >
-            <button
-              type="button"
-              className="block w-full text-left"
-              onClick={() => setPreview(c)}
-              aria-label={`Expand image for ${c.name}`}
-            >
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-white sm:aspect-[16/8]">
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  loading="lazy"
-                  className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
-                  {getShortLabel(c.name)}
+            <div>
+              <button
+                type="button"
+                className="block w-full text-left"
+                onClick={() => setPreview({ container: c, type: "main" })}
+                aria-label={`Expand image for ${c.name}`}
+              >
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-white sm:aspect-[16/8]">
+                  <img
+                    src={c.image}
+                    alt={c.name}
+                    loading="lazy"
+                    className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                    {getShortLabel(c.name)}
+                  </span>
+                </div>
+
+                <span className="block bg-[#f8fafc] px-4 py-2 text-center text-[10px] font-medium text-[var(--color-accent-light)]">
+                  Click to expand
                 </span>
-              </div>
+              </button>
 
-              <span className="block bg-[#f8fafc] px-4 py-2 text-center text-[10px] font-medium text-[var(--color-accent-light)]">
-                Click to expand
-              </span>
-            </button>
-
-            <div className="p-4 sm:p-5 md:p-6">
-              <span className="inline-flex shrink-0 items-center rounded-full border border-[#0A2542] px-12 py-1 text-[11px] font-medium text-[#0A2542]">
-                {c.category}
-              </span>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <h3 className="min-w-0 flex-1 text-[17px] font-semibold leading-snug text-[#111827] md:text-lg">
-                  {c.name}
-                </h3>
-              </div>
-
-              <dl className="mt-5 grid gap-x-5 gap-y-4 border-y border-gray-100 py-4 text-[13px] text-[#374151] md:grid-cols-2 md:text-sm">
-                <div className="min-w-0">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
-                    Internal dimensions
-                  </dt>{" "}
-                  <dd className="mt-1">{c.internal}</dd>
+              <div className="p-4 sm:p-5 md:p-6">
+                <span className="inline-flex shrink-0 items-center rounded-full border border-[#0A2542] px-4 py-1 text-[11px] font-medium text-[#0A2542]">
+                  {c.category}
+                </span>
+                <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+                  <h3 className="min-w-0 flex-1 text-[17px] font-semibold leading-snug text-[#111827] md:text-lg">
+                    {c.name}
+                  </h3>
                 </div>
-                <div className="min-w-0">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
-                    Max payload
-                  </dt>{" "}
-                  <dd className="mt-1">{c.payload}</dd>
-                </div>
-                <div className="min-w-0">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
-                    Capacity
-                  </dt>{" "}
-                  <dd className="mt-1">{c.capacity}</dd>
-                </div>
-              </dl>
 
-              <div className="mt-4 rounded-xl bg-[#f8fafc] p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0A2542]">
-                  Best for
-                </p>
-                <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280] md:text-sm">
-                  {c.use}
-                </p>
+                <dl className="mt-5 grid gap-x-5 gap-y-4 border-y border-gray-100 py-4 text-[13px] text-[#374151] md:grid-cols-2 md:text-sm">
+                  <div className="min-w-0">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Internal dimensions
+                    </dt>{" "}
+                    <dd className="mt-1">{c.internal}</dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Max payload
+                    </dt>{" "}
+                    <dd className="mt-1">{c.payload}</dd>
+                  </div>
+                  <div className="min-w-0">
+                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
+                      Capacity
+                    </dt>{" "}
+                    <dd className="mt-1">{c.capacity}</dd>
+                  </div>
+                </dl>
+
+                <div className="mt-4 rounded-xl bg-[#f8fafc] p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0A2542]">
+                    Best for
+                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280] md:text-sm">
+                    {c.use}
+                  </p>
+                </div>
               </div>
+            </div>
+
+            {/* More Details Button */}
+            <div className="px-4 pb-4 sm:px-5 sm:pb-5 md:px-6 md:pb-6">
+              <button
+                type="button"
+                onClick={() => setPreview({ container: c, type: "details" })}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#0A2542] bg-white px-4 py-2.5 text-xs font-semibold text-[#0A2542] transition-colors hover:bg-[#0A2542] hover:text-white md:text-sm"
+              >
+                <span>More Details</span>
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                  />
+                </svg>
+              </button>
             </div>
           </article>
         ))}
       </div>
+
       {preview && (
         <ResourceImageModal
-          label={preview.name}
-          code={getShortLabel(preview.name)}
-          imageUrl={preview.image}
+          label={
+            preview.type === "details"
+              ? `${preview.container.name} — Technical Details`
+              : preview.container.name
+          }
+          code={getShortLabel(preview.container.name)}
+          imageUrl={
+            preview.type === "details"
+              ? preview.container.detailImage
+              : preview.container.image
+          }
           onClose={() => setPreview(null)}
         />
       )}
