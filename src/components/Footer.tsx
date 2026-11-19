@@ -62,7 +62,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/find-forwarder" className="transition hover:text-white">
-                  Find Freight Forwarder
+                  Member Directory
                 </Link>
               </li>
               <li>

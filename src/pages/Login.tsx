@@ -1,11 +1,12 @@
 // src/pages/Login.tsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/AuthLayout";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -28,7 +29,8 @@ export default function LoginPage() {
       await login(email.trim(), password);
 
       setSuccess("Login successful.");
-      navigate("/dashboard", { replace: true });
+      const next = searchParams.get("next");
+      navigate(next?.startsWith("/") ? next : "/dashboard", { replace: true });
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ||

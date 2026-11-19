@@ -8,14 +8,14 @@ export default function DirectoryActions() {
     <div className="relative z-10 mx-auto -mt-9 max-w-5xl px-4">
       <div className="grid gap-2 rounded-2xl border border-white/60 bg-white/95 p-2 shadow-[0_16px_40px_rgba(1,30,79,0.14)] backdrop-blur-xl md:grid-cols-3">
         <ActionCard
-          to="/find-forwarder"
+          to="/find-forwarder?type=forwarder"
           icon={<FaShip />}
           eyebrow="Partner search"
           title="Find a freight forwarder"
           body="Connect with logistics specialists across our network."
         />
         <ActionCard
-          to="/find-exporter"
+          to="/find-forwarder?type=exporter"
           icon={<FaHandshake />}
           eyebrow="Business discovery"
           title="Find an exporter or importer"

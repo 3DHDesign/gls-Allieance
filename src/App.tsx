@@ -21,7 +21,6 @@ import ProfilePage from "./pages/ProfilePage";
 import PaymentPage from "./pages/PaymentPage";
 import AccountPage from "./pages/AccountPage";
 import VerifyOtp from "./pages/VerifyOtp";
-import FindExporterImporter from "./pages/FindExporterImporter";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -40,11 +39,18 @@ export default function App() {
         <Route path="/member-registration" element={<MemberRegistration />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
-        <Route path="/forwarder/:id" element={<ForwarderProfile />} />
+        <Route
+          path="/forwarder/:id"
+          element={
+            <ProtectedRoute>
+              <ForwarderProfile />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/find-exporter" element={<FindExporterImporter />} />
+        <Route path="/find-exporter" element={<FindForwarder />} />
 
         {/* Protected Routes */}
         <Route

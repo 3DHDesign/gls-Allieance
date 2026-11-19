@@ -5,6 +5,7 @@ import {
   normalizeMembers,
   type GetMemberDirectoryParams,
 } from "../../api/memberDirectory";
+import { FiRotateCcw, FiSearch } from "react-icons/fi";
 
 type Props = {
   profileType: GetMemberDirectoryParams["profile_type"];
@@ -124,24 +125,27 @@ export default function DirectoryFilters({
 
   return (
     <section className="container mt-6">
-      <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 md:p-8">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-[var(--color-accent)]">
-              Member Directory
-            </h2>
+      <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,35,75,0.06)]">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-7">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-50 text-[var(--color-accent)]">
+              <FiSearch />
+            </span>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Search directory</p>
+              <h2 className="mt-1 text-base font-bold text-[#0b1f3b]">Find a member</h2>
+            </div>
           </div>
-
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:border-slate-300"
           >
-            <span>⟲</span> Reset
+            <FiRotateCcw /> Reset
           </button>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 p-5 sm:p-7 md:grid-cols-2 lg:grid-cols-4">
           {/* Country */}
           <div>
             <label className="block text-sm mb-2">Country</label>
