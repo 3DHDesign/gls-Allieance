@@ -4,6 +4,7 @@ import DashboardShell from "../components/DashboardShell";
 import { makePayment } from "../api/payment";
 import { getMemberByUserId, type MemberRegistration } from "../api/member";
 import { payablePayment, type PayablePaymentDetails } from "payable-ipg-js";
+import { getActivePackages, type MembershipPackage } from "../api/package";
 
 function getErrorMessage(error: unknown) {
   if (typeof error === "object" && error !== null && "response" in error) {
@@ -62,6 +63,8 @@ export default function PaymentPage() {
   const [manualMessage, setManualMessage] = useState<string | null>(null);
   const [gatewayLoading, setGatewayLoading] = useState(false);
   const [manualLoading, setManualLoading] = useState(false);
+  const [packages, setPackages] = useState<MembershipPackage[]>([]);
+  const [selectedPackageId, setSelectedPackageId] = useState<number | "">("");
 
   useEffect(() => {
     if (!userId) return;
@@ -69,6 +72,18 @@ export default function PaymentPage() {
       .then((res) => setMember(res.data))
       .catch((error: unknown) => setGatewayMessage(getErrorMessage(error)));
   }, [userId]);
+
+  useEffect(() => {
+    getActivePackages()
+      .then((items) => {
+        setPackages(items);
+        if (items.length > 0) {
+          setSelectedPackageId(items[0].id);
+          setAmount(String(items[0].price));
+        }
+      })
+      .catch((error: unknown) => setGatewayMessage(getErrorMessage(error)));
+  }, []);
 
   const contact = member?.contacts?.[0];
   const customerName = useMemo(() => {
@@ -113,6 +128,10 @@ export default function PaymentPage() {
       setGatewayMessage("A complete billing address is required for online payment.");
       return;
     }
+    if (!selectedPackageId) {
+      setGatewayMessage("Select a package before payment.");
+      return;
+    }
     const postalCode = (member.zip_code?.trim() || "0000").slice(0, 10);
     const billingCountry = getCountryCode(member.country);
     if (billingCountry.length !== 3) {
@@ -133,7 +152,7 @@ export default function PaymentPage() {
     const checkValue = await sha512(
       `${merchantKey}|${invoiceId}|${formattedAmount}|${currencyCode}|${tokenHash}`,
     );
-    const payment: PayablePaymentDetails = {
+    const payment = {
       logoUrl,
       notifyUrl,
       returnUrl,
@@ -155,7 +174,8 @@ export default function PaymentPage() {
       currencyCode,
       paymentType: "1",
       custom1: String(userId),
-    };
+      custom2: String(selectedPackageId),
+    } as PayablePaymentDetails & { custom2: string };
 
     try {
       setGatewayLoading(true);
@@ -185,9 +205,11 @@ export default function PaymentPage() {
     if (!amount.trim()) return setManualMessage("Amount is required.");
     if (!transactionId.trim()) return setManualMessage("Transaction ID required.");
     if (!slip) return setManualMessage("Upload slip.");
+    if (!selectedPackageId) return setManualMessage("Select a package.");
 
     const fd = new FormData();
     fd.append("user_id", String(userId));
+    fd.append("package_id", String(selectedPackageId));
     fd.append("payment_type", "manual");
     fd.append("amount", amount.trim());
     fd.append("payment_method", "transaction");
@@ -215,6 +237,54 @@ export default function PaymentPage() {
           Payment
         </h1>
         <p className="mt-1 text-muted">Pay securely by card or submit a manual payment slip.</p>
+
+        {packages.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-[#0b1f3b]">Choose a package</h2>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {packages.map((membershipPackage) => {
+                const selected = selectedPackageId === membershipPackage.id;
+                return (
+                  <button
+                    type="button"
+                    key={membershipPackage.id}
+                    onClick={() => {
+                      setSelectedPackageId(membershipPackage.id);
+                      setAmount(String(membershipPackage.price));
+                    }}
+                    className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition ${
+                      selected
+                        ? "border-[var(--color-accent)] ring-2 ring-[var(--color-accent)]"
+                        : "border-gray-200 hover:border-[var(--color-accent)]/60"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-lg font-semibold text-[#0b1f3b]">
+                          {membershipPackage.name}
+                        </div>
+                        <div className="mt-1 text-sm capitalize text-muted">
+                          {membershipPackage.billing_cycle} membership
+                        </div>
+                      </div>
+                      {selected && (
+                        <span className="rounded-full bg-[var(--color-accent)] px-2 py-1 text-xs text-white">
+                          Selected
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-4 text-2xl font-bold text-[#0b1f3b]">
+                      LKR {Number(membershipPackage.price).toLocaleString()}
+                    </div>
+                    <div className="mt-1 text-sm text-muted">
+                      {membershipPackage.duration} days
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 bg-white border rounded-2xl p-6 shadow-sm max-w-xl">
           <h2 className="text-xl font-semibold text-[#0b1f3b]">Pay online</h2>
